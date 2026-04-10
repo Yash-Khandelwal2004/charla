@@ -1,0 +1,466 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ── Light Mode ────────────────────────────────────────── */
+:root {
+  --background: #ffffff;
+  --surface-1: #fafafa;
+  --surface-2: #f4f4f5;
+  --surface-3: #e4e4e7;
+  --foreground: #09090b;
+  --muted-foreground: #71717a;
+  --subtle-foreground: #a1a1aa;
+  --border: #e4e4e7;
+  --input: #f4f4f5;
+  --ring: #3b82f620;
+  --radius: 0.5rem;
+
+  --primary: #18181b;
+  --primary-hover: #27272a;
+  --primary-muted: #f4f4f5;
+  --primary-foreground: #ffffff;
+  --accent: #3b82f6;
+  --accent-muted: #3b82f618;
+
+  /* Shadcn compat */
+  --card: #fafafa;
+  --card-foreground: #09090b;
+  --popover: #ffffff;
+  --popover-foreground: #09090b;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #09090b;
+  --muted: #f4f4f5;
+  --accent-foreground: #09090b;
+  --destructive: oklch(0.577 0.245 27.325);
+
+  --sidebar: #fafafa;
+  --sidebar-foreground: #09090b;
+  --sidebar-primary: #18181b;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f4f4f5;
+  --sidebar-accent-foreground: #09090b;
+  --sidebar-border: #e4e4e7;
+  --sidebar-ring: #3b82f620;
+
+  /* Subject accent colors (muted) */
+  --subject-science: #7c3aed;
+  --subject-maths: #d97706;
+  --subject-language: #0284c7;
+  --subject-coding: #db2777;
+  --subject-history: #ea580c;
+  --subject-economics: #059669;
+}
+
+/* ── Dark Mode ─────────────────────────────────────────── */
+.dark {
+  --background: #09090b;
+  --surface-1: #111113;
+  --surface-2: #1c1c1f;
+  --surface-3: #27272a;
+  --foreground: #fafafa;
+  --muted-foreground: #71717a;
+  --subtle-foreground: #52525b;
+  --border: #27272a;
+  --input: #1c1c1f;
+  --ring: #3b82f620;
+
+  --primary: #fafafa;
+  --primary-hover: #e4e4e7;
+  --primary-muted: #1c1c1f;
+  --primary-foreground: #09090b;
+  --accent: #3b82f6;
+  --accent-muted: #3b82f618;
+
+  --card: #111113;
+  --card-foreground: #fafafa;
+  --popover: #111113;
+  --popover-foreground: #fafafa;
+  --secondary: #1c1c1f;
+  --secondary-foreground: #fafafa;
+  --muted: #1c1c1f;
+  --accent-foreground: #fafafa;
+  --destructive: oklch(0.577 0.245 27.325);
+
+  --sidebar: #111113;
+  --sidebar-foreground: #fafafa;
+  --sidebar-primary: #fafafa;
+  --sidebar-primary-foreground: #09090b;
+  --sidebar-accent: #1c1c1f;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: #27272a;
+  --sidebar-ring: #3b82f620;
+
+  --subject-science: #a78bfa;
+  --subject-maths: #fbbf24;
+  --subject-language: #38bdf8;
+  --subject-coding: #f472b6;
+  --subject-history: #fb923c;
+  --subject-economics: #34d399;
+}
+
+/* ── Tailwind Theme Bindings ───────────────────────────── */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-accent: var(--accent);
+  --font-bricolage: "Bricolage Grotesque", sans-serif;
+  --font-inter: "Inter", sans-serif;
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 6px);
+}
+
+/* ── Base ─────────────────────────────────────────────── */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease;
+  }
+
+  body {
+    font-family: var(--font-inter);
+    background-color: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  main {
+    @apply mx-auto px-6 max-sm:px-4 flex flex-col gap-8 h-full max-w-[1400px] pt-10 mb-10;
+    background-color: var(--background);
+  }
+
+  h1 {
+    @apply text-3xl font-bold tracking-tight;
+    font-family: var(--font-bricolage);
+    color: var(--foreground);
+  }
+
+  h2 {
+    font-family: var(--font-bricolage);
+    color: var(--foreground);
+  }
+
+  h3 {
+    font-family: var(--font-bricolage);
+  }
+
+  /* Subtle scrollbar */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted-foreground); }
+}
+
+/* ── Components ───────────────────────────────────────── */
+@layer components {
+
+  /* ── Navbar ── */
+  .navbar {
+    @apply flex items-center justify-between mx-auto w-full px-6 max-sm:px-4 py-4 sticky top-0 z-50;
+    background-color: var(--background);
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── Sign In Button ── */
+  .btn-signin {
+    @apply px-4 py-2 text-sm font-medium rounded-md cursor-pointer;
+    background-color: transparent;
+    color: var(--foreground);
+    border: 1px solid var(--border);
+  }
+  .btn-signin:hover {
+    background-color: var(--surface-2);
+  }
+
+  /* ── Primary Button ── */
+  .btn-primary {
+    @apply px-4 py-2 rounded-md cursor-pointer flex items-center gap-2 text-sm font-medium;
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+  .btn-primary:hover {
+    opacity: 0.9;
+  }
+
+  /* ── Secondary Button ── */
+  .btn-secondary {
+    @apply px-4 py-2 rounded-md cursor-pointer flex items-center gap-2 text-sm font-medium;
+    background-color: transparent;
+    color: var(--foreground);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover {
+    background-color: var(--surface-2);
+  }
+
+  /* ── Companion Card ── */
+  .companion-card {
+    @apply flex flex-col rounded-lg px-5 py-5 gap-5 w-full min-lg:max-w-[410px] justify-between cursor-pointer;
+    background-color: var(--surface-1);
+    border: 1px solid var(--surface-3);
+    border-left: 3px solid transparent;
+  }
+  .companion-card:hover {
+    border-color: var(--accent);
+  }
+
+  .companion-list {
+    @apply rounded-lg px-7 pt-7 pb-10 max-lg:w-full;
+    background-color: var(--surface-1);
+    border: 1px solid var(--surface-3);
+  }
+
+  /* ── Badges ── */
+  .subject-badge {
+    @apply text-xs px-2.5 py-1 rounded-md capitalize font-medium;
+    background-color: var(--surface-2);
+    color: var(--muted-foreground);
+    border: 1px solid var(--surface-3);
+  }
+
+  .companion-bookmark {
+    @apply px-2 rounded-lg flex items-center h-full aspect-square cursor-pointer;
+    background-color: var(--surface-2);
+  }
+  .companion-bookmark:hover {
+    background-color: var(--surface-3);
+  }
+
+  /* ── Inputs ── */
+  .input {
+    @apply rounded-md px-3 py-2 text-sm w-full;
+    background-color: var(--surface-1) !important;
+    border: 1px solid var(--surface-3) !important;
+    color: var(--foreground) !important;
+  }
+  .input:focus, .input:focus-visible {
+    border-color: var(--accent) !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  .input::placeholder {
+    color: var(--muted-foreground);
+  }
+
+  /* ── Layout Sections ── */
+  .home-section {
+    @apply flex gap-4 justify-between items-start w-full max-lg:flex-col max-lg:items-stretch;
+  }
+
+  .companions-grid {
+    @apply grid gap-4 w-full;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+
+  .rounded-border {
+    @apply rounded-lg;
+    border: 1px solid var(--surface-3);
+  }
+
+  /* ── CTA Section ── */
+  .cta-section {
+    @apply rounded-lg px-6 py-8 flex flex-col items-center text-center gap-4 w-1/3 max-lg:w-1/2 max-md:w-full;
+    background-color: var(--surface-1);
+    border: 1px solid var(--surface-3);
+  }
+
+  .cta-badge {
+    @apply rounded-md px-3 py-1.5 text-xs font-semibold tracking-wide uppercase;
+    background-color: var(--accent-muted);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+
+  /* ── Tool Cards ── */
+  .tool-card {
+    @apply flex flex-col rounded-lg p-4 gap-3 cursor-pointer;
+    background-color: var(--surface-1);
+    border: 1px solid var(--surface-3);
+  }
+  .tool-card:hover {
+    border-color: var(--accent);
+  }
+
+  .tool-icon {
+    @apply w-10 h-10 rounded-lg flex items-center justify-center;
+    background-color: var(--surface-2);
+    color: var(--foreground);
+  }
+
+  .tool-badge {
+    @apply text-xs px-2 py-0.5 rounded-md font-medium;
+    background-color: var(--surface-2);
+    color: var(--muted-foreground);
+  }
+
+  /* ── Companion Session ── */
+  .companion-section {
+    @apply w-2/3 max-sm:w-full flex flex-col gap-4 justify-center items-center rounded-lg;
+    border: 1px solid var(--surface-3);
+  }
+
+  .companion-avatar {
+    @apply size-[300px] flex items-center justify-center rounded-lg max-sm:size-[100px] mt-4;
+    background-color: var(--surface-1);
+  }
+
+  .companion-lottie {
+    @apply size-[300px] max-sm:size-[100px];
+  }
+
+  .user-section {
+    @apply flex flex-col gap-4 w-1/3 max-sm:w-full max-sm:flex-row;
+  }
+
+  .user-avatar {
+    @apply flex flex-col gap-4 items-center rounded-lg py-8 max-sm:hidden;
+    border: 1px solid var(--surface-3);
+    background-color: var(--surface-1);
+  }
+
+  .btn-mic {
+    @apply rounded-lg flex flex-col gap-2 items-center py-8 max-sm:py-2 cursor-pointer w-full;
+    border: 1px solid var(--surface-3);
+    background-color: var(--surface-1);
+  }
+  .btn-mic:hover {
+    border-color: var(--accent);
+    background-color: var(--surface-2);
+  }
+
+  .transcript {
+    @apply relative flex flex-col gap-4 w-full items-center pt-10 flex-grow overflow-hidden;
+  }
+
+  .transcript-message {
+    @apply overflow-y-auto w-full flex flex-col gap-4 max-sm:gap-2 pr-2 h-full text-2xl;
+    color: var(--foreground);
+  }
+
+  .transcript-fade {
+    @apply pointer-events-none absolute bottom-0 left-0 right-0 h-40 max-sm:h-20 z-10;
+    background: linear-gradient(to top, var(--background), transparent);
+  }
+
+  .companion-limit {
+    @apply items-center justify-center flex flex-col gap-4 w-full min-2xl:w-1/2 pt-20 text-center;
+  }
+
+  /* ── Stats Cards ── */
+  .stat-card {
+    @apply rounded-lg p-4 flex flex-col gap-2 min-w-[90px];
+    background-color: var(--surface-1);
+    border: 1px solid var(--surface-3);
+  }
+
+  /* ── Page Header ── */
+  .page-header {
+    @apply flex justify-between items-center gap-4 max-sm:flex-col;
+  }
+
+  .section-title {
+    @apply text-xl font-semibold tracking-tight;
+    font-family: var(--font-bricolage);
+    color: var(--foreground);
+  }
+
+  /* ── Divider ── */
+  .divider {
+    @apply w-full h-px;
+    background-color: var(--surface-3);
+  }
+
+  /* ── Tool Grid ── */
+  .tool-grid {
+    @apply grid grid-cols-2 gap-6 max-lg:grid-cols-1;
+  }
+
+  /* ── Theme Toggle ── */
+  .theme-toggle {
+    @apply p-2 rounded-md cursor-pointer flex items-center justify-center;
+    color: var(--muted-foreground);
+    border: 1px solid transparent;
+  }
+  .theme-toggle:hover {
+    color: var(--foreground);
+    background-color: var(--surface-2);
+  }
+
+  /* ── Mobile Drawer Overlay ── */
+  .drawer-overlay {
+    @apply fixed inset-0 z-40;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .drawer-panel {
+    @apply fixed top-0 right-0 h-full w-[280px] z-50 flex flex-col gap-1 px-6 py-6;
+    background-color: var(--background);
+    border-left: 1px solid var(--border);
+    animation: slideIn 200ms ease;
+  }
+
+  @keyframes slideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+}
+
+/* ── Utilities ────────────────────────────────────────── */
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .text-muted { color: var(--muted-foreground); }
+  .text-subtle { color: var(--subtle-foreground); }
+
+  .bg-surface-1 { background-color: var(--surface-1); }
+  .bg-surface-2 { background-color: var(--surface-2); }
+  .bg-surface-3 { background-color: var(--surface-3); }
+
+  .border-surface { border-color: var(--surface-3); }
+}
+
+/* ── Shadcn Overrides ─────────────────────────────────── */
+[data-radix-popper-content-wrapper] > * {
+  background-color: var(--surface-1) !important;
+  border-color: var(--surface-3) !important;
+  color: var(--foreground) !important;
+}
+
+tr {
+  border-color: var(--surface-3) !important;
+}
+tr:hover td {
+  background-color: var(--surface-2) !important;
+}
+
+[data-state] button {
+  color: var(--foreground);
+}
