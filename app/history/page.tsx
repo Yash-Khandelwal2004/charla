@@ -6,6 +6,7 @@ import { getUserSessionsWithTranscripts } from "@/lib/actions/companion.actions"
 import { useUser } from "@clerk/nextjs";
 import { tools } from "@/constants";
 import Link from "next/link";
+import SessionInsightsView from "@/components/SessionInsights";
 
 type Tab = "tools" | "sessions";
 type ToolFilter = "all" | string;
@@ -21,13 +22,15 @@ const formatDate = (dateStr: string) => {
 };
 
 const getToolMeta = (toolName: string) => {
-  return tools.find((t) => t.id === toolName) ?? {
-    label: toolName,
-    icon: "🔧",
-    category: "productivity",
-    href: "/tools",
-    description: "",
-  };
+  return (
+    tools.find((t) => t.id === toolName) ?? {
+      label: toolName,
+      icon: "🔧",
+      category: "productivity",
+      href: "/tools",
+      description: "",
+    }
+  );
 };
 
 const HistoryPage = () => {
@@ -49,8 +52,16 @@ const HistoryPage = () => {
           getUserToolUsage(50),
           user ? getUserSessionsWithTranscripts(user.id, 30) : [],
         ]);
-        setToolHistory(tools);
-        setSessionHistory(sessions);
+        // Dedupe by id in case of duplicate inserts/fetches
+        const uniqueTools = Array.from(
+          new Map(tools.map((t: any) => [t.id, t])).values(),
+        );
+        const uniqueSessions = Array.from(
+          new Map(sessions.map((s: any) => [s.id, s])).values(),
+        );
+
+        setToolHistory(uniqueTools as ToolUsage[]);
+        setSessionHistory(uniqueSessions);
       } catch (e) {
         console.error(e);
       } finally {
@@ -74,9 +85,10 @@ const HistoryPage = () => {
     }
   };
 
-  const filteredTools = toolFilter === "all"
-    ? toolHistory
-    : toolHistory.filter((t) => t.tool_name === toolFilter);
+  const filteredTools =
+    toolFilter === "all"
+      ? toolHistory
+      : toolHistory.filter((t) => t.tool_name === toolFilter);
 
   const uniqueToolNames = [...new Set(toolHistory.map((t) => t.tool_name))];
 
@@ -85,24 +97,33 @@ const HistoryPage = () => {
     return text.split("\n").map((line, i) => {
       if (line.startsWith("### ") || line.startsWith("## ")) {
         return (
-          <p key={i} className="font-semibold text-sm mt-4 mb-1"
-            style={{ color: "var(--text-primary)" }}>
+          <p
+            key={i}
+            className="font-semibold text-sm mt-4 mb-1"
+            style={{ color: "var(--text-primary)" }}
+          >
             {line.replace(/^#{2,3}\s/, "")}
           </p>
         );
       }
       if (/^\d+\.\s\*\*(.+)\*\*/.test(line)) {
         return (
-          <p key={i} className="font-semibold text-sm mt-3"
-            style={{ color: "var(--text-primary)" }}>
+          <p
+            key={i}
+            className="font-semibold text-sm mt-3"
+            style={{ color: "var(--text-primary)" }}
+          >
             {line.replace(/\*\*/g, "")}
           </p>
         );
       }
       if (line.startsWith("- ") || line.startsWith("• ")) {
         return (
-          <p key={i} className="text-sm ml-4"
-            style={{ color: "var(--text-secondary)" }}>
+          <p
+            key={i}
+            className="text-sm ml-4"
+            style={{ color: "var(--text-secondary)" }}
+          >
             • {line.replace(/^[-•]\s/, "").replace(/\*\*(.+?)\*\*/g, "$1")}
           </p>
         );
@@ -110,19 +131,30 @@ const HistoryPage = () => {
       if (line.includes("**")) {
         const parts = line.split(/\*\*(.+?)\*\*/g);
         return (
-          <p key={i} className="text-sm" style={{ color: "var(--text-secondary)" }}>
+          <p
+            key={i}
+            className="text-sm"
+            style={{ color: "var(--text-secondary)" }}
+          >
             {parts.map((part, j) =>
-              j % 2 === 1
-                ? <strong key={j} style={{ color: "var(--text-primary)" }}>{part}</strong>
-                : part
+              j % 2 === 1 ? (
+                <strong key={j} style={{ color: "var(--text-primary)" }}>
+                  {part}
+                </strong>
+              ) : (
+                part
+              ),
             )}
           </p>
         );
       }
       if (line.trim() === "") return <div key={i} className="h-2" />;
       return (
-        <p key={i} className="text-sm leading-relaxed"
-          style={{ color: "var(--text-secondary)" }}>
+        <p
+          key={i}
+          className="text-sm leading-relaxed"
+          style={{ color: "var(--text-secondary)" }}
+        >
           {line}
         </p>
       );
@@ -152,11 +184,19 @@ const HistoryPage = () => {
             onClick={() => setActiveTab(tab)}
             className="px-4 py-2.5 text-sm font-medium capitalize transition-all duration-150 relative cursor-pointer"
             style={{
-              color: activeTab === tab ? "var(--text-primary)" : "var(--text-tertiary)",
-              borderBottom: activeTab === tab ? "2px solid var(--accent)" : "2px solid transparent",
+              color:
+                activeTab === tab
+                  ? "var(--text-primary)"
+                  : "var(--text-tertiary)",
+              borderBottom:
+                activeTab === tab
+                  ? "2px solid var(--accent)"
+                  : "2px solid transparent",
             }}
           >
-            {tab === "tools" ? `Tool History (${toolHistory.length})` : `Conversations (${sessionHistory.length})`}
+            {tab === "tools"
+              ? `Tool History (${toolHistory.length})`
+              : `Conversations (${sessionHistory.length})`}
           </button>
         ))}
       </div>
@@ -164,7 +204,6 @@ const HistoryPage = () => {
       {/* Tool History Tab */}
       {activeTab === "tools" && (
         <div className="flex flex-col gap-4">
-
           {/* Filter by tool */}
           {uniqueToolNames.length > 0 && (
             <div className="flex gap-2 flex-wrap">
@@ -172,8 +211,14 @@ const HistoryPage = () => {
                 onClick={() => setToolFilter("all")}
                 className="px-3 py-1 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer"
                 style={{
-                  backgroundColor: toolFilter === "all" ? "var(--accent-muted)" : "var(--bg-subtle)",
-                  color: toolFilter === "all" ? "var(--accent)" : "var(--text-tertiary)",
+                  backgroundColor:
+                    toolFilter === "all"
+                      ? "var(--accent-muted)"
+                      : "var(--bg-subtle)",
+                  color:
+                    toolFilter === "all"
+                      ? "var(--accent)"
+                      : "var(--text-tertiary)",
                   border: `1px solid ${toolFilter === "all" ? "var(--accent)" : "var(--border-default)"}`,
                 }}
               >
@@ -187,8 +232,14 @@ const HistoryPage = () => {
                     onClick={() => setToolFilter(name)}
                     className="px-3 py-1 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer"
                     style={{
-                      backgroundColor: toolFilter === name ? "var(--accent-muted)" : "var(--bg-subtle)",
-                      color: toolFilter === name ? "var(--accent)" : "var(--text-tertiary)",
+                      backgroundColor:
+                        toolFilter === name
+                          ? "var(--accent-muted)"
+                          : "var(--bg-subtle)",
+                      color:
+                        toolFilter === name
+                          ? "var(--accent)"
+                          : "var(--text-tertiary)",
                       border: `1px solid ${toolFilter === name ? "var(--accent)" : "var(--border-default)"}`,
                     }}
                   >
@@ -202,19 +253,31 @@ const HistoryPage = () => {
           {loading ? (
             <div className="flex flex-col gap-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="rounded-xl p-4 animate-pulse"
-                  style={{ backgroundColor: "var(--bg-raised)", border: "1px solid var(--border-default)", height: "80px" }} />
+                <div
+                  key={i}
+                  className="rounded-xl p-4 animate-pulse"
+                  style={{
+                    backgroundColor: "var(--bg-raised)",
+                    border: "1px solid var(--border-default)",
+                    height: "80px",
+                  }}
+                />
               ))}
             </div>
           ) : filteredTools.length === 0 ? (
             <div
               className="rounded-xl p-10 flex flex-col items-center gap-3"
-              style={{ backgroundColor: "var(--bg-raised)", border: "1px dashed var(--border-default)" }}
+              style={{
+                backgroundColor: "var(--bg-raised)",
+                border: "1px dashed var(--border-default)",
+              }}
             >
               <span className="text-4xl">🔧</span>
               <p className="text-sm" style={{ color: "var(--text-tertiary)" }}>
                 No tool history yet.{" "}
-                <Link href="/tools" style={{ color: "var(--accent)" }}>Browse tools →</Link>
+                <Link href="/tools" style={{ color: "var(--accent)" }}>
+                  Browse tools →
+                </Link>
               </p>
             </div>
           ) : (
@@ -235,7 +298,9 @@ const HistoryPage = () => {
                     {/* Row header */}
                     <div
                       className="flex items-center justify-between px-4 py-3 cursor-pointer"
-                      onClick={() => setExpandedTool(isExpanded ? null : usage.id)}
+                      onClick={() =>
+                        setExpandedTool(isExpanded ? null : usage.id)
+                      }
                     >
                       <div className="flex items-center gap-3">
                         <span
@@ -245,18 +310,26 @@ const HistoryPage = () => {
                           {meta.icon}
                         </span>
                         <div className="flex flex-col gap-0.5">
-                          <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                          <p
+                            className="text-sm font-semibold"
+                            style={{ color: "var(--text-primary)" }}
+                          >
                             {meta.label}
                           </p>
-                          <p className="text-xs line-clamp-1 max-w-[400px]"
-                            style={{ color: "var(--text-tertiary)" }}>
+                          <p
+                            className="text-xs line-clamp-1 max-w-[400px]"
+                            style={{ color: "var(--text-tertiary)" }}
+                          >
                             {usage.output.slice(0, 80)}...
                           </p>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-3 flex-shrink-0">
-                        <span className="text-xs" style={{ color: "var(--text-tertiary)" }}>
+                        <span
+                          className="text-xs"
+                          style={{ color: "var(--text-tertiary)" }}
+                        >
                           {formatDate(usage.created_at)}
                         </span>
                         <Link
@@ -271,10 +344,16 @@ const HistoryPage = () => {
                           Use again
                         </Link>
                         <button
-                          onClick={(e) => { e.stopPropagation(); handleDeleteTool(usage.id); }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteTool(usage.id);
+                          }}
                           disabled={deletingId === usage.id}
                           className="text-xs px-2 py-1 rounded-lg transition-colors duration-150 cursor-pointer"
-                          style={{ color: "var(--color-danger)", opacity: deletingId === usage.id ? 0.5 : 1 }}
+                          style={{
+                            color: "var(--color-danger)",
+                            opacity: deletingId === usage.id ? 0.5 : 1,
+                          }}
                         >
                           {deletingId === usage.id ? "..." : "Delete"}
                         </button>
@@ -282,7 +361,9 @@ const HistoryPage = () => {
                           className="text-xs transition-transform duration-200"
                           style={{
                             color: "var(--text-tertiary)",
-                            transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
+                            transform: isExpanded
+                              ? "rotate(180deg)"
+                              : "rotate(0deg)",
                             display: "inline-block",
                           }}
                         >
@@ -299,8 +380,10 @@ const HistoryPage = () => {
                       >
                         {/* Input section */}
                         <div className="mb-4">
-                          <p className="text-xs font-medium uppercase tracking-wide mb-2"
-                            style={{ color: "var(--text-tertiary)" }}>
+                          <p
+                            className="text-xs font-medium uppercase tracking-wide mb-2"
+                            style={{ color: "var(--text-tertiary)" }}
+                          >
                             Your Input
                           </p>
                           <div
@@ -313,8 +396,13 @@ const HistoryPage = () => {
                           >
                             {Object.entries(usage.input).map(([key, value]) => (
                               <div key={key} className="mb-1">
-                                <span style={{ color: "var(--text-tertiary)" }}>{key}: </span>
-                                <span>{String(value).slice(0, 200)}{String(value).length > 200 ? "..." : ""}</span>
+                                <span style={{ color: "var(--text-tertiary)" }}>
+                                  {key}:{" "}
+                                </span>
+                                <span>
+                                  {String(value).slice(0, 200)}
+                                  {String(value).length > 200 ? "..." : ""}
+                                </span>
                               </div>
                             ))}
                           </div>
@@ -323,14 +411,21 @@ const HistoryPage = () => {
                         {/* Output section */}
                         <div>
                           <div className="flex items-center justify-between mb-2">
-                            <p className="text-xs font-medium uppercase tracking-wide"
-                              style={{ color: "var(--text-tertiary)" }}>
+                            <p
+                              className="text-xs font-medium uppercase tracking-wide"
+                              style={{ color: "var(--text-tertiary)" }}
+                            >
                               Result
                             </p>
                             <button
-                              onClick={() => navigator.clipboard.writeText(usage.output)}
+                              onClick={() =>
+                                navigator.clipboard.writeText(usage.output)
+                              }
                               className="text-xs px-2 py-1 rounded transition-colors cursor-pointer"
-                              style={{ color: "var(--text-tertiary)", backgroundColor: "var(--bg-subtle)" }}
+                              style={{
+                                color: "var(--text-tertiary)",
+                                backgroundColor: "var(--bg-subtle)",
+                              }}
                             >
                               Copy
                             </button>
@@ -361,25 +456,38 @@ const HistoryPage = () => {
           {loading ? (
             <div className="flex flex-col gap-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="rounded-xl p-4 animate-pulse"
-                  style={{ backgroundColor: "var(--bg-raised)", border: "1px solid var(--border-default)", height: "80px" }} />
+                <div
+                  key={i}
+                  className="rounded-xl p-4 animate-pulse"
+                  style={{
+                    backgroundColor: "var(--bg-raised)",
+                    border: "1px solid var(--border-default)",
+                    height: "80px",
+                  }}
+                />
               ))}
             </div>
           ) : sessionHistory.length === 0 ? (
             <div
               className="rounded-xl p-10 flex flex-col items-center gap-3"
-              style={{ backgroundColor: "var(--bg-raised)", border: "1px dashed var(--border-default)" }}
+              style={{
+                backgroundColor: "var(--bg-raised)",
+                border: "1px dashed var(--border-default)",
+              }}
             >
               <span className="text-4xl">🎓</span>
               <p className="text-sm" style={{ color: "var(--text-tertiary)" }}>
                 No sessions yet.{" "}
-                <Link href="/companions" style={{ color: "var(--accent)" }}>Start a session →</Link>
+                <Link href="/companions" style={{ color: "var(--accent)" }}>
+                  Start a session →
+                </Link>
               </p>
             </div>
           ) : (
             sessionHistory.map((session: any) => {
               const companion = session.companions;
               const transcript: SavedMessage[] = session.transcript || [];
+              const insights: SessionInsights | null = session.insights ?? null;
               const isExpanded = expandedSession === session.id;
 
               return (
@@ -394,7 +502,9 @@ const HistoryPage = () => {
                   {/* Row header */}
                   <div
                     className="flex items-center justify-between px-4 py-3 cursor-pointer"
-                    onClick={() => setExpandedSession(isExpanded ? null : session.id)}
+                    onClick={() =>
+                      setExpandedSession(isExpanded ? null : session.id)
+                    }
                   >
                     <div className="flex items-center gap-3">
                       <span
@@ -404,17 +514,27 @@ const HistoryPage = () => {
                         🎓
                       </span>
                       <div className="flex flex-col gap-0.5">
-                        <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                        <p
+                          className="text-sm font-semibold"
+                          style={{ color: "var(--text-primary)" }}
+                        >
                           {companion?.name || "Companion Session"}
                         </p>
-                        <p className="text-xs" style={{ color: "var(--text-tertiary)" }}>
-                          {companion?.subject} · {companion?.topic} · {transcript.length} messages
+                        <p
+                          className="text-xs"
+                          style={{ color: "var(--text-tertiary)" }}
+                        >
+                          {companion?.subject} · {companion?.topic} ·{" "}
+                          {transcript.length} messages
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3 flex-shrink-0">
-                      <span className="text-xs" style={{ color: "var(--text-tertiary)" }}>
+                      <span
+                        className="text-xs"
+                        style={{ color: "var(--text-tertiary)" }}
+                      >
                         {formatDate(session.created_at)}
                       </span>
                       {companion && (
@@ -422,7 +542,10 @@ const HistoryPage = () => {
                           href={`/companions/${companion.id}`}
                           onClick={(e) => e.stopPropagation()}
                           className="text-xs px-2.5 py-1 rounded-lg"
-                          style={{ backgroundColor: "var(--accent-muted)", color: "var(--accent)" }}
+                          style={{
+                            backgroundColor: "var(--accent-muted)",
+                            color: "var(--accent)",
+                          }}
                         >
                           Resume
                         </Link>
@@ -431,7 +554,9 @@ const HistoryPage = () => {
                         className="text-xs transition-transform duration-200"
                         style={{
                           color: "var(--text-tertiary)",
-                          transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
+                          transform: isExpanded
+                            ? "rotate(180deg)"
+                            : "rotate(0deg)",
                           display: "inline-block",
                         }}
                       >
@@ -439,51 +564,111 @@ const HistoryPage = () => {
                       </span>
                     </div>
                   </div>
+                  {/* Expanded content */}
 
-                  {/* Expanded transcript */}
                   {isExpanded && (
                     <div
-                      className="px-4 pb-4 pt-2 border-t"
-                      style={{ borderColor: "var(--border-default)" }}
+                      className="px-4 pb-5 pt-4 border-t"
+                      style={{
+                        borderColor: "var(--border-default)",
+                        backgroundColor: "var(--bg-base)",
+                      }}
                     >
-                      <p className="text-xs font-medium uppercase tracking-wide mb-3"
-                        style={{ color: "var(--text-tertiary)" }}>
-                        Conversation Transcript
-                      </p>
-
-                      {transcript.length === 0 ? (
-                        <p className="text-sm" style={{ color: "var(--text-tertiary)" }}>
-                          No transcript recorded for this session.
-                        </p>
+                      {/* Insights section */}
+                      {insights ? (
+                        <SessionInsightsView insights={insights} />
                       ) : (
-                        <div className="flex flex-col gap-2 max-h-96 overflow-y-auto pr-1">
-                          {[...transcript].reverse().map((message, idx) => (
-                            <div
-                              key={idx}
-                              className={`flex gap-2 ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}
-                            >
-                              <div
-                                className="w-6 h-6 rounded-full flex items-center justify-center text-xs flex-shrink-0 mt-0.5"
-                                style={{ backgroundColor: "var(--bg-overlay)" }}
-                              >
-                                {message.role === "user" ? "👤" : "🤖"}
-                              </div>
-                              <div
-                                className="rounded-xl px-3 py-2 text-sm max-w-[80%]"
-                                style={{
-                                  backgroundColor: message.role === "user"
-                                    ? "var(--accent-muted)"
-                                    : "var(--bg-overlay)",
-                                  color: "var(--text-primary)",
-                                  border: "1px solid var(--border-default)",
-                                }}
-                              >
-                                {message.content}
-                              </div>
-                            </div>
-                          ))}
+                        <div
+                          className="rounded-lg p-3 text-xs flex items-center gap-2 mb-4"
+                          style={{
+                            backgroundColor: "var(--bg-overlay)",
+                            color: "var(--text-tertiary)",
+                            border: "1px solid var(--border-default)",
+                          }}
+                        >
+                          <span>⏳</span>
+                          {transcript.length === 0
+                            ? "No insights available — session has no transcript."
+                            : "Insights are still being generated for this session. Refresh in a moment."}
                         </div>
                       )}
+
+                      {/* Transcript section */}
+                      <div
+                        className="rounded-lg overflow-hidden"
+                        style={{ border: "1px solid var(--border-default)" }}
+                      >
+                        <div
+                          className="px-3 py-2.5 flex items-center gap-2"
+                          style={{
+                            backgroundColor: "var(--bg-overlay)",
+                            borderBottom: "1px solid var(--border-default)",
+                          }}
+                        >
+                          <span
+                            className="text-xs font-semibold uppercase tracking-wider"
+                            style={{
+                              color: "var(--text-tertiary)",
+                              letterSpacing: "0.04em",
+                            }}
+                          >
+                            💬 Conversation Transcript
+                          </span>
+                          <span
+                            className="text-xs ml-auto px-2 py-0.5 rounded-full"
+                            style={{
+                              backgroundColor: "var(--bg-subtle)",
+                              color: "var(--text-tertiary)",
+                            }}
+                          >
+                            {transcript.length} messages
+                          </span>
+                        </div>
+
+                        {transcript.length === 0 ? (
+                          <p
+                            className="text-sm p-4"
+                            style={{ color: "var(--text-tertiary)" }}
+                          >
+                            No transcript recorded for this session.
+                          </p>
+                        ) : (
+                          <div
+                            className="flex flex-col gap-2 max-h-96 overflow-y-auto p-3"
+                            style={{ backgroundColor: "var(--bg-raised)" }}
+                          >
+                            {[...transcript].reverse().map((message, idx) => (
+                              <div
+                                key={idx}
+                                className={`flex gap-2 ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}
+                              >
+                                <div
+                                  className="w-6 h-6 rounded-full flex items-center justify-center text-xs flex-shrink-0 mt-0.5"
+                                  style={{
+                                    backgroundColor: "var(--bg-overlay)",
+                                    border: "1px solid var(--border-default)",
+                                  }}
+                                >
+                                  {message.role === "user" ? "👤" : "🤖"}
+                                </div>
+                                <div
+                                  className="rounded-xl px-3 py-2 text-sm max-w-[80%]"
+                                  style={{
+                                    backgroundColor:
+                                      message.role === "user"
+                                        ? "var(--accent-muted)"
+                                        : "var(--bg-overlay)",
+                                    color: "var(--text-primary)",
+                                    border: "1px solid var(--border-default)",
+                                  }}
+                                >
+                                  {message.content}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>

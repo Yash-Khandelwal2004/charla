@@ -24,6 +24,7 @@ const CompanionComponent = ({
   const [isMuted, setIsMuted] = useState(false);
   const [messages, setMessages] = useState<SavedMessage[]>([]);
   const messagesRef = useRef<SavedMessage[]>([]);
+  const sessionSavedRef = useRef(false);
 
   const lottieRef = useRef<LottieRefCurrentProps>(null);
 
@@ -42,6 +43,10 @@ const CompanionComponent = ({
 
     const onCallEnd = async () => {
       setCallStatus(CallStatus.FINISHED);
+
+      // Guard against the "call-end" event firing more than once
+      if (sessionSavedRef.current) return;
+      sessionSavedRef.current = true;
 
       // Use the ref — always up to date, unlike `messages` state in this closure
       const finalTranscript = messagesRef.current;
@@ -107,9 +112,10 @@ const CompanionComponent = ({
   const handleCall = async () => {
     setCallStatus(CallStatus.CONNECTING);
 
-    // Reset transcript state for a fresh session
+    // Reset transcript state and save guard for a fresh session
     setMessages([]);
     messagesRef.current = [];
+    sessionSavedRef.current = false;
 
     const assistantOverrides = {
       variableValues: { subject, topic, style },

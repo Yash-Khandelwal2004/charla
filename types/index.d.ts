@@ -239,3 +239,30 @@ interface SessionHistory {
 interface ToolUsageWithInput extends ToolUsage {
   title?: string;
 }
+
+
+// Add to types/index.d.ts
+
+interface QuizQuestion {
+  question: string;
+  options: string[];
+  correct_answer: string;
+  explanation: string;
+}
+
+interface SessionInsights {
+  summary: string;
+  struggled_with: string[];
+  quiz: QuizQuestion[];
+  next_topic: string;
+}
+
+interface SessionHistory {
+  id: string;
+  companion_id: string;
+  user_id: string;
+  transcript: SavedMessage[];
+  insights: SessionInsights | null;
+  created_at: string;
+  companions?: Companion;
+}
