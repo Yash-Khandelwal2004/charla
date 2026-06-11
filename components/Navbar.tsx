@@ -1,30 +1,10 @@
 "use client";
 import Link from "next/link";
-import Image from "next/image";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-import { useState, useEffect } from "react";
-import { useTheme } from "next-themes";
-import { Sun, Moon } from "lucide-react";
+import { useState } from "react";
+import { X } from "lucide-react";
 import NavItems from "@/components/NavItems";
-
-const ThemeToggle = () => {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
-
-  if (!mounted) return <div className="w-9 h-9" />;
-
-  return (
-    <button
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="theme-toggle"
-      aria-label="Toggle theme"
-    >
-      {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-    </button>
-  );
-};
+import ThemeToggle from "@/components/ThemeToggle";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -34,20 +14,39 @@ const Navbar = () => {
       <nav className="navbar">
         {/* Logo */}
         <Link href="/">
-          <div className="flex items-center gap-2 cursor-pointer">
-            <Image src="/images/logo.svg" alt="Charla" width={32} height={32} />
+          <div className="flex items-center gap-2.5 cursor-pointer">
+            {/* Logo mark — geometric CH monogram */}
+            <div
+              className="w-8 h-8 flex items-center justify-center rounded-md text-xs font-bold"
+              style={{
+                backgroundColor: "var(--accent)",
+                color: "#1a1917",
+                fontFamily: "var(--font-bricolage)",
+                letterSpacing: "-0.03em",
+              }}
+            >
+              CH
+            </div>
             <span
-              className="font-bold text-lg tracking-tight"
-              style={{ color: "var(--foreground)", fontFamily: "var(--font-bricolage)" }}
+              className="font-bold text-lg max-sm:hidden"
+              style={{
+                color: "var(--foreground)",
+                fontFamily: "var(--font-bricolage)",
+                letterSpacing: "-0.02em",
+              }}
             >
               charla
             </span>
           </div>
         </Link>
 
-        {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-4">
+        {/* Desktop nav — center */}
+        <div className="hidden md:flex items-center gap-1">
           <NavItems />
+        </div>
+
+        {/* Desktop right */}
+        <div className="hidden md:flex items-center gap-3">
           <ThemeToggle />
           <SignedOut>
             <SignInButton>
@@ -95,51 +94,46 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Mobile drawer */}
+      {/* Mobile full-screen overlay menu */}
       {menuOpen && (
-        <>
-          <div className="drawer-overlay md:hidden" onClick={() => setMenuOpen(false)} />
-          <div className="drawer-panel md:hidden">
-            <div className="flex justify-between items-center mb-6">
-              <span
-                className="font-bold text-lg"
-                style={{ color: "var(--foreground)", fontFamily: "var(--font-bricolage)" }}
-              >
-                Menu
-              </span>
-              <button
-                onClick={() => setMenuOpen(false)}
-                className="p-1 cursor-pointer"
-                style={{ color: "var(--muted-foreground)" }}
-              >
-                ✕
-              </button>
-            </div>
-            {[
-              { label: "Home", href: "/" },
-              { label: "Companions", href: "/companions" },
-              { label: "Tools", href: "/tools" },
-              { label: "My Journey", href: "/my-journey" },
-            ].map(({ label, href }) => (
-              <Link
-                key={label}
-                href={href}
-                onClick={() => setMenuOpen(false)}
-                className="px-3 py-2.5 rounded-md text-sm font-medium"
-                style={{ color: "var(--foreground)" }}
-              >
-                {label}
-              </Link>
-            ))}
+        <div className="mobile-overlay md:hidden">
+          {/* Close button */}
+          <button
+            onClick={() => setMenuOpen(false)}
+            className="absolute top-4 right-4 p-2 cursor-pointer"
+            style={{ color: "var(--muted-foreground)" }}
+            aria-label="Close menu"
+          >
+            <X size={24} />
+          </button>
+
+          {/* Navigation links */}
+          {[
+            { label: "Home", href: "/" },
+            { label: "Companions", href: "/companions" },
+            { label: "Tools", href: "/tools" },
+            { label: "My Journey", href: "/my-journey" },
+          ].map(({ label, href }) => (
+            <Link
+              key={label}
+              href={href}
+              onClick={() => setMenuOpen(false)}
+              className="mobile-overlay-link"
+            >
+              {label}
+            </Link>
+          ))}
+
+          <div className="mt-auto">
             <SignedOut>
               <SignInButton>
-                <button className="btn-signin w-full justify-center mt-4">
+                <button className="btn-primary w-full justify-center py-3 text-base">
                   Sign In
                 </button>
               </SignInButton>
             </SignedOut>
           </div>
-        </>
+        </div>
       )}
     </>
   );

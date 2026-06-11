@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { Copy, Check } from "lucide-react";
 
 interface ToolOutputProps {
   output: string;
@@ -15,18 +16,22 @@ const ToolOutput = ({ output, toolName }: ToolOutputProps) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Simple markdown-like renderer
+  // Simple markdown-like renderer with proper typography
   const renderOutput = (text: string) => {
     return text
       .split("\n")
       .map((line, i) => {
-        // H2 bold headers like **Title**
+        // H2 bold headers like ## Title
         if (line.startsWith("## ")) {
           return (
             <h2
               key={i}
               className="text-lg font-bold mt-6 mb-2"
-              style={{ color: "var(--foreground)", fontFamily: "var(--font-bricolage)" }}
+              style={{
+                color: "var(--foreground)",
+                fontFamily: "var(--font-bricolage)",
+                letterSpacing: "-0.02em",
+              }}
             >
               {line.replace("## ", "")}
             </h2>
@@ -53,6 +58,22 @@ const ToolOutput = ({ output, toolName }: ToolOutputProps) => {
             >
               {line.replace(/^[-•]\s/, "").replace(/\*\*(.+?)\*\*/g, "$1")}
             </li>
+          );
+        }
+        // Code blocks (backtick lines)
+        if (line.startsWith("```") || line.startsWith("`")) {
+          return (
+            <code
+              key={i}
+              className="text-[13px] px-2 py-1 rounded block"
+              style={{
+                backgroundColor: "var(--surface-2)",
+                color: "var(--foreground)",
+                fontFamily: "var(--font-mono)",
+              }}
+            >
+              {line.replace(/`/g, "")}
+            </code>
           );
         }
         // Bold inline text
@@ -85,10 +106,11 @@ const ToolOutput = ({ output, toolName }: ToolOutputProps) => {
 
   return (
     <div
-      className="rounded-lg p-6 flex flex-col gap-4"
+      className="flex flex-col gap-4 p-6"
       style={{
         backgroundColor: "var(--surface-1)",
-        border: "1px solid var(--surface-3)",
+        border: "1px solid var(--border)",
+        borderRadius: "10px",
       }}
     >
       {/* Header */}
@@ -104,14 +126,15 @@ const ToolOutput = ({ output, toolName }: ToolOutputProps) => {
         </div>
         <button
           onClick={handleCopy}
-          className="text-xs px-3 py-1.5 rounded-md cursor-pointer"
+          className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md cursor-pointer"
           style={{
-            backgroundColor: copied ? "var(--accent-muted)" : "var(--surface-2)",
+            backgroundColor: copied ? "var(--accent-muted)" : "transparent",
             color: copied ? "var(--accent)" : "var(--muted-foreground)",
-            border: "1px solid var(--surface-3)",
+            border: "none",
           }}
         >
-          {copied ? "✓ Copied" : "Copy"}
+          {copied ? <Check size={12} /> : <Copy size={12} />}
+          {copied ? "Copied" : "Copy"}
         </button>
       </div>
 

@@ -14,6 +14,7 @@ import {
 import { getUserToolUsage, getUserToolCount } from "@/lib/actions/tools.actions";
 import Image from "next/image";
 import CompanionsList from "@/components/CompanionsList";
+import StatsCard from "@/components/StatsCard";
 import Link from "next/link";
 import { tools } from "@/constants";
 
@@ -108,19 +109,7 @@ const Profile = async () => {
         {/* Stats */}
         <div className="flex gap-3 flex-wrap">
           {statCards.map((stat, i) => (
-            <div key={i} className="stat-card min-w-[110px]">
-              <div className="flex items-center gap-2">
-                {stat.icon ? (
-                  <Image src={stat.icon} alt={stat.label} width={18} height={18} />
-                ) : (
-                  <span className="text-base">{stat.emoji}</span>
-                )}
-                <p className="text-2xl font-bold">{stat.value}</p>
-              </div>
-              <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
-                {stat.label}
-              </p>
-            </div>
+            <StatsCard key={i} {...stat} />
           ))}
         </div>
       </section>
@@ -131,7 +120,7 @@ const Profile = async () => {
       <Accordion type="multiple" defaultValue={["tools"]}>
 
         {/* Tool Usage History */}
-        <AccordionItem value="tools" style={{ borderColor: "var(--surface-3)" }}>
+        <AccordionItem value="tools" style={{ borderColor: "var(--border)" }}>
           <AccordionTrigger
             className="text-xl font-semibold hover:no-underline"
             style={{ color: "var(--foreground)" }}
@@ -153,8 +142,12 @@ const Profile = async () => {
           <AccordionContent>
             {toolUsage.length === 0 ? (
               <div
-                className="rounded-lg p-8 flex flex-col items-center gap-2 text-center"
-                style={{ backgroundColor: "var(--surface-1)", border: "1px dashed var(--surface-3)" }}
+                className="p-8 flex flex-col items-center gap-2 text-center"
+                style={{
+                  backgroundColor: "var(--surface-1)",
+                  border: "1px dashed var(--border)",
+                  borderRadius: "10px",
+                }}
               >
                 <span className="text-3xl">🔧</span>
                 <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>
@@ -174,7 +167,8 @@ const Profile = async () => {
                         className="flex items-center justify-between px-4 py-3 rounded-lg group"
                         style={{
                           backgroundColor: "var(--surface-1)",
-                          border: "1px solid var(--surface-3)",
+                          border: "1px solid var(--border)",
+                          borderRadius: "10px",
                         }}
                       >
                         <div className="flex items-center gap-3">
@@ -221,7 +215,7 @@ const Profile = async () => {
         </AccordionItem>
 
         {/* Bookmarked Companions */}
-        <AccordionItem value="bookmarks" style={{ borderColor: "var(--surface-3)" }}>
+        <AccordionItem value="bookmarks" style={{ borderColor: "var(--border)" }}>
           <AccordionTrigger
             className="text-xl font-semibold hover:no-underline"
             style={{ color: "var(--foreground)" }}
@@ -249,7 +243,7 @@ const Profile = async () => {
         </AccordionItem>
 
         {/* Recent Sessions */}
-        <AccordionItem value="recent" style={{ borderColor: "var(--surface-3)" }}>
+        <AccordionItem value="recent" style={{ borderColor: "var(--border)" }}>
           <AccordionTrigger
             className="text-xl font-semibold hover:no-underline"
             style={{ color: "var(--foreground)" }}
@@ -274,7 +268,7 @@ const Profile = async () => {
         </AccordionItem>
 
         {/* My Companions */}
-        <AccordionItem value="companions" style={{ borderColor: "var(--surface-3)" }}>
+        <AccordionItem value="companions" style={{ borderColor: "var(--border)" }}>
           <AccordionTrigger
             className="text-xl font-semibold hover:no-underline"
             style={{ color: "var(--foreground)" }}

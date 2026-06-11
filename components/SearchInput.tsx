@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import { Search, X } from "lucide-react";
 import { formUrlQuery, removeKeysFromUrlQuery } from "@jsmastery/utils";
 
 const SearchInput = () => {
@@ -37,25 +37,21 @@ const SearchInput = () => {
 
   return (
     <div
-      className="relative flex items-center gap-2 px-3 py-2 rounded-md h-fit"
+      className="relative flex items-center gap-2 px-3 py-2 h-fit"
       style={{
-        backgroundColor: "var(--surface-1)",
-        border: "1px solid var(--surface-3)",
+        backgroundColor: "var(--surface-2)",
+        border: "1px solid var(--border)",
+        borderRadius: "6px",
+        transition: "border-color 150ms ease",
       }}
       onFocusCapture={(e) => {
         (e.currentTarget as HTMLDivElement).style.borderColor = "var(--accent)";
       }}
       onBlurCapture={(e) => {
-        (e.currentTarget as HTMLDivElement).style.borderColor = "var(--surface-3)";
+        (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)";
       }}
     >
-      <Image
-        src="/icons/search.svg"
-        alt="search"
-        width={14}
-        height={14}
-        className="opacity-50 flex-shrink-0"
-      />
+      <Search size={14} style={{ color: "var(--muted-foreground)", flexShrink: 0 }} />
       <input
         placeholder="Search companions..."
         className="outline-none bg-transparent text-sm w-[160px]"
@@ -66,10 +62,10 @@ const SearchInput = () => {
       {searchQuery && (
         <button
           onClick={() => setSearchQuery("")}
-          className="text-xs flex-shrink-0"
+          className="flex-shrink-0 cursor-pointer"
           style={{ color: "var(--muted-foreground)" }}
         >
-          ✕
+          <X size={14} />
         </button>
       )}
     </div>

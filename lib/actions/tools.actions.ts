@@ -1,11 +1,15 @@
-'use server';
+"use server";
 
 import { auth } from "@clerk/nextjs/server";
 import { createSupabaseClient } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
 
 // ── Save tool usage to DB ─────────────────────────────
-export const saveToolUsage = async ({ tool_name, input, output }: SaveToolUsage) => {
+export const saveToolUsage = async ({
+  tool_name,
+  input,
+  output,
+}: SaveToolUsage) => {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
@@ -106,10 +110,10 @@ export const callAI = async (prompt: string): Promise<string> => {
         ],
         generationConfig: {
           temperature: 0.7,
-          maxOutputTokens: 2000,
+          maxOutputTokens: 8192,
         },
       }),
-    }
+    },
   );
 
   if (!response.ok) {
@@ -122,7 +126,9 @@ export const callAI = async (prompt: string): Promise<string> => {
 };
 
 // ── ATS Scanner ───────────────────────────────────────
-export const runATSScanner = async (input: ATSScannerInput): Promise<ToolResult> => {
+export const runATSScanner = async (
+  input: ATSScannerInput,
+): Promise<ToolResult> => {
   try {
     const prompt = `
 You are an ATS (Applicant Tracking System) expert. Analyze the resume against the job description below.
@@ -153,7 +159,9 @@ Be specific and actionable.
 };
 
 // ── Resume Builder ────────────────────────────────────
-export const runResumeBuilder = async (input: ResumeBuilderInput): Promise<ToolResult> => {
+export const runResumeBuilder = async (
+  input: ResumeBuilderInput,
+): Promise<ToolResult> => {
   try {
     const prompt = `
 Build a professional, ATS-optimized resume from the following information.
@@ -186,7 +194,9 @@ Make it ATS-friendly, professional, and compelling. Use markdown formatting.
 };
 
 // ── Cover Letter Generator ────────────────────────────
-export const runCoverLetter = async (input: CoverLetterInput): Promise<ToolResult> => {
+export const runCoverLetter = async (
+  input: CoverLetterInput,
+): Promise<ToolResult> => {
   try {
     const prompt = `
 Write a compelling cover letter for this job application.
@@ -217,7 +227,9 @@ Keep it under 350 words. Make it feel human, not templated.
 };
 
 // ── JD Decoder ────────────────────────────────────────
-export const runJDDecoder = async (input: JDDecoderInput): Promise<ToolResult> => {
+export const runJDDecoder = async (
+  input: JDDecoderInput,
+): Promise<ToolResult> => {
   try {
     const prompt = `
 Decode this job description and extract what the employer REALLY wants.
@@ -245,7 +257,9 @@ Provide:
 };
 
 // ── LinkedIn Bio Writer ───────────────────────────────
-export const runLinkedInBio = async (input: LinkedInBioInput): Promise<ToolResult> => {
+export const runLinkedInBio = async (
+  input: LinkedInBioInput,
+): Promise<ToolResult> => {
   try {
     const prompt = `
 Write an optimized LinkedIn profile for this person.
@@ -274,7 +288,9 @@ Make it feel authentic and human, not like a bot wrote it.
 };
 
 // ── Salary Coach ──────────────────────────────────────
-export const runSalaryCoach = async (input: SalaryCoachInput): Promise<ToolResult> => {
+export const runSalaryCoach = async (
+  input: SalaryCoachInput,
+): Promise<ToolResult> => {
   try {
     const prompt = `
 You are a salary negotiation coach. Help this person negotiate their offer.
@@ -303,7 +319,9 @@ Provide:
 };
 
 // ── Cold Outreach Writer ──────────────────────────────
-export const runColdOutreach = async (input: ColdOutreachInput): Promise<ToolResult> => {
+export const runColdOutreach = async (
+  input: ColdOutreachInput,
+): Promise<ToolResult> => {
   try {
     const prompt = `
 Write a highly personalized cold outreach email.
@@ -334,7 +352,9 @@ Write:
 };
 
 // ── Paper Explainer ───────────────────────────────────
-export const runPaperExplainer = async (input: PaperExplainerInput): Promise<ToolResult> => {
+export const runPaperExplainer = async (
+  input: PaperExplainerInput,
+): Promise<ToolResult> => {
   try {
     const prompt = `
 Explain this research paper at a ${input.detail_level} level.
@@ -363,7 +383,9 @@ ${input.detail_level === "detailed" ? "Include methodology details, statistical 
 };
 
 // ── Assignment Planner ────────────────────────────────
-export const runAssignmentPlanner = async (input: AssignmentPlannerInput): Promise<ToolResult> => {
+export const runAssignmentPlanner = async (
+  input: AssignmentPlannerInput,
+): Promise<ToolResult> => {
   try {
     const prompt = `
 Create a detailed assignment plan for this student.
@@ -392,7 +414,9 @@ Provide:
 };
 
 // ── Email Drafting ────────────────────────────────────
-export const runEmailDraft = async (input: EmailDraftInput): Promise<ToolResult> => {
+export const runEmailDraft = async (
+  input: EmailDraftInput,
+): Promise<ToolResult> => {
   try {
     const prompt = `
 Draft a professional email based on these details.
@@ -420,7 +444,9 @@ Keep it clear, purposeful, and appropriate for the recipient.
 };
 
 // ── Code Reviewer ─────────────────────────────────────
-export const runCodeReviewer = async (input: CodeReviewerInput): Promise<ToolResult> => {
+export const runCodeReviewer = async (
+  input: CodeReviewerInput,
+): Promise<ToolResult> => {
   try {
     const prompt = `
 Review this ${input.language} code with focus on: ${input.focus}.
@@ -454,11 +480,16 @@ Be specific — reference actual lines of code in your feedback.
 // Place after the getUserToolCount function
 
 // Free tier: 10 tool uses/month, Pro: unlimited
-export const checkToolLimit = async (): Promise<{ allowed: boolean; used: number; limit: number; isPro: boolean }> => {
+export const checkToolLimit = async (): Promise<{
+  allowed: boolean;
+  used: number;
+  limit: number;
+  isPro: boolean;
+}> => {
   const { userId, has } = await auth();
   if (!userId) return { allowed: false, used: 0, limit: 0, isPro: false };
 
-  const isPro = has({ plan: 'pro' });
+  const isPro = has({ plan: "pro" });
 
   if (isPro) return { allowed: true, used: 0, limit: Infinity, isPro: true };
 
@@ -483,11 +514,12 @@ export const checkToolLimit = async (): Promise<{ allowed: boolean; used: number
   return { allowed: used < limit, used, limit, isPro: false };
 };
 
-
 // ── ADD THESE TO THE BOTTOM OF lib/actions/tools.actions.ts ──
 
 // ── Plagiarism Rewriter ───────────────────────────────
-export const runPlagiarismRewriter = async (input: PlagiarismRewriterInput): Promise<ToolResult> => {
+export const runPlagiarismRewriter = async (
+  input: PlagiarismRewriterInput,
+): Promise<ToolResult> => {
   try {
     const prompt = `
 You are an expert academic writer. Rewrite the following text to make it original while preserving the exact meaning and all key information.
@@ -520,7 +552,9 @@ Rules:
 };
 
 // ── Meeting Summarizer ────────────────────────────────
-export const runMeetingSummarizer = async (input: MeetingSummarizerInput): Promise<ToolResult> => {
+export const runMeetingSummarizer = async (
+  input: MeetingSummarizerInput,
+): Promise<ToolResult> => {
   try {
     const prompt = `
 You are an expert at summarizing meetings and extracting actionable information.
@@ -551,7 +585,9 @@ Be concise and actionable. Focus on what matters most.
 };
 
 // ── Documentation Writer ──────────────────────────────
-export const runDocWriter = async (input: DocWriterInput): Promise<ToolResult> => {
+export const runDocWriter = async (
+  input: DocWriterInput,
+): Promise<ToolResult> => {
   try {
     const prompt = `
 You are an expert technical writer. Write clear, professional documentation for the following.
@@ -563,30 +599,42 @@ ${input.content}
 ${input.audience ? `TARGET AUDIENCE: ${input.audience}` : ""}
 
 Generate complete documentation including:
-${input.doc_type === "code" ? `
+${
+  input.doc_type === "code"
+    ? `
 1. **Overview**: What this code does in plain English
 2. **Parameters/Arguments**: Table of all inputs with types and descriptions
 3. **Return Value**: What it returns and when
 4. **Usage Examples**: 2-3 practical code examples
 5. **Edge Cases & Errors**: Known limitations and error handling
 6. **Notes**: Any important caveats or dependencies
-` : ""}
-${input.doc_type === "api" ? `
+`
+    : ""
+}
+${
+  input.doc_type === "api"
+    ? `
 1. **Endpoint Overview**: Method, URL, and purpose
 2. **Request Parameters**: Headers, query params, body schema
 3. **Response Schema**: Success and error response formats with examples
 4. **Authentication**: How to authenticate
 5. **Code Examples**: curl, JavaScript, and Python examples
 6. **Error Codes**: List of possible errors and meanings
-` : ""}
-${input.doc_type === "process" ? `
+`
+    : ""
+}
+${
+  input.doc_type === "process"
+    ? `
 1. **Overview**: What this process achieves
 2. **Prerequisites**: What's needed before starting
 3. **Step-by-Step Guide**: Numbered steps with clear instructions
 4. **Expected Outcomes**: What success looks like at each step
 5. **Troubleshooting**: Common issues and fixes
 6. **FAQs**: 3 common questions about this process
-` : ""}
+`
+    : ""
+}
 
 Use markdown formatting. Be clear, precise, and developer-friendly.
     `.trim();
@@ -600,7 +648,9 @@ Use markdown formatting. Be clear, precise, and developer-friendly.
 };
 
 // ── Skill Gap Analyzer ────────────────────────────────
-export const runSkillGapAnalyzer = async (input: SkillGapAnalyzerInput): Promise<ToolResult> => {
+export const runSkillGapAnalyzer = async (
+  input: SkillGapAnalyzerInput,
+): Promise<ToolResult> => {
   try {
     const prompt = `
 You are a career development expert. Analyze the skill gap between this person's current skills and their target role.
@@ -633,4 +683,65 @@ Be honest, specific, and encouraging.
   } catch (error: any) {
     return { success: false, output: "", error: error.message };
   }
+};
+
+
+export const getToolUsageById = async (id: string): Promise<ToolUsage | null> => {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const supabase = createSupabaseClient();
+
+  const { data, error } = await supabase
+    .from("tool_usage")
+    .select()
+    .eq("id", id)
+    .eq("user_id", userId)
+    .single();
+
+  if (error) return null;
+  return data as ToolUsage;
+};
+
+// Get tool usage grouped by tool name with counts
+export const getToolUsageSummary = async () => {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const supabase = createSupabaseClient();
+
+  const { data, error } = await supabase
+    .from("tool_usage")
+    .select("tool_name, created_at")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (error) throw new Error(error.message);
+
+  // Group by tool name
+  const summary = data.reduce((acc: Record<string, number>, row) => {
+    acc[row.tool_name] = (acc[row.tool_name] || 0) + 1;
+    return acc;
+  }, {});
+
+  return summary;
+};
+
+// Delete a tool usage record
+export const deleteToolUsage = async (id: string) => {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const supabase = createSupabaseClient();
+
+  const { error } = await supabase
+    .from("tool_usage")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", userId);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/history");
+  revalidatePath("/my-journey");
 };

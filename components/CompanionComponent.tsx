@@ -6,7 +6,8 @@ import { vapi } from "@/lib/vapi.sdk";
 import Image from "next/image";
 import Lottie, { LottieRefCurrentProps } from "lottie-react";
 import soundwaves from '@/constants/soundwaves.json';
-import { addToSessionHistory } from "@/lib/actions/companion.actions";
+import { addToSessionHistory, generateSessionInsights } from "@/lib/actions/companion.actions";
+
 
 enum CallStatus {
   INACTIVE = 'INACTIVE',
@@ -22,6 +23,7 @@ const CompanionComponent = ({
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [messages, setMessages] = useState<SavedMessage[]>([]);
+  const messagesRef = useRef<SavedMessage[]>([]);
 
   const lottieRef = useRef<LottieRefCurrentProps>(null);
 
@@ -38,15 +40,40 @@ const CompanionComponent = ({
   useEffect(() => {
     const onCallStart = () => setCallStatus(CallStatus.ACTIVE);
 
-    const onCallEnd = () => {
+    const onCallEnd = async () => {
       setCallStatus(CallStatus.FINISHED);
-      addToSessionHistory(companionId);
+
+      // Use the ref — always up to date, unlike `messages` state in this closure
+      const finalTranscript = messagesRef.current;
+
+      try {
+        const session = await addToSessionHistory(companionId, finalTranscript);
+
+        // Generate insights in the background — don't block the UI
+        if (session?.id && finalTranscript.length > 0) {
+          generateSessionInsights(
+            session.id,
+            finalTranscript,
+            name,
+            subject,
+            topic
+          ).catch((err) => {
+            console.error("Failed to generate insights:", err);
+          });
+        }
+      } catch (error) {
+        console.error("Failed to save session transcript:", error);
+      }
     };
 
     const onMessage = (message: Message) => {
       if (message.type === 'transcript' && message.transcriptType === 'final') {
         const newMessage = { role: message.role, content: message.transcript };
-        setMessages((prev) => [newMessage, ...prev]);
+        setMessages((prev) => {
+          const updated = [newMessage, ...prev];
+          messagesRef.current = updated; // keep ref in sync
+          return updated;
+        });
       }
     };
 
@@ -79,6 +106,11 @@ const CompanionComponent = ({
 
   const handleCall = async () => {
     setCallStatus(CallStatus.CONNECTING);
+
+    // Reset transcript state for a fresh session
+    setMessages([]);
+    messagesRef.current = [];
+
     const assistantOverrides = {
       variableValues: { subject, topic, style },
       clientMessages: ["transcript"],
@@ -140,13 +172,22 @@ const CompanionComponent = ({
           </div>
 
           <div className="flex flex-col items-center gap-1 pb-4">
-            <p className="font-bold text-xl" style={{ color: "var(--foreground)", fontFamily: "var(--font-bricolage)" }}>{name}</p>
+            <p
+              className="font-bold text-xl"
+              style={{
+                color: "var(--foreground)",
+                fontFamily: "var(--font-bricolage)",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {name}
+            </p>
             <span
               className="flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-md capitalize"
               style={{
                 backgroundColor: "var(--surface-2)",
                 color: subjectColor,
-                border: "1px solid var(--surface-3)",
+                border: "1px solid var(--border)",
               }}
             >
               <span
@@ -169,7 +210,14 @@ const CompanionComponent = ({
               height={100}
               className="rounded-lg"
             />
-            <p className="font-bold text-lg" style={{ color: "var(--foreground)", fontFamily: "var(--font-bricolage)" }}>
+            <p
+              className="font-bold text-lg"
+              style={{
+                color: "var(--foreground)",
+                fontFamily: "var(--font-bricolage)",
+                letterSpacing: "-0.02em",
+              }}
+            >
               {userName}
             </p>
           </div>
@@ -205,11 +253,12 @@ const CompanionComponent = ({
             style={{
               backgroundColor:
                 callStatus === CallStatus.ACTIVE
-                  ? '#dc2626'
-                  : 'var(--primary)',
+                  ? 'var(--destructive)'
+                  : 'var(--accent)',
               color: callStatus === CallStatus.ACTIVE
                 ? '#ffffff'
-                : 'var(--primary-foreground)',
+                : '#1a1917',
+              borderRadius: '10px',
             }}
           >
             {callStatus === CallStatus.ACTIVE
@@ -229,8 +278,6 @@ const CompanionComponent = ({
                     ? '#22c55e'
                     : callStatus === CallStatus.CONNECTING
                     ? '#f59e0b'
-                    : callStatus === CallStatus.FINISHED
-                    ? 'var(--muted-foreground)'
                     : 'var(--muted-foreground)',
               }}
             />
@@ -247,34 +294,41 @@ const CompanionComponent = ({
         </div>
       </section>
 
-      {/* Transcript */}
+      {/* Transcript — Chat bubble style */}
       <section className="transcript">
         <div className="transcript-message no-scrollbar">
           {messages.length === 0 && (
-            <p className="text-center text-sm py-8" style={{ color: "var(--muted-foreground)" }}>
+            <p
+              className="text-center text-sm py-8"
+              style={{ color: "var(--muted-foreground)" }}
+            >
               Transcript will appear here once the session starts...
             </p>
           )}
           {messages.map((message, index) => {
-            if (message.role === 'assistant') {
-              return (
-                <p key={index} className="text-lg max-sm:text-sm leading-relaxed"
-                  style={{ color: "var(--foreground)" }}>
-                  <span className="font-semibold" style={{ color: subjectColor }}>
-                    {name.split(' ')[0]}:
-                  </span>{' '}
+            const isAI = message.role === 'assistant';
+            const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return (
+              <div
+                key={index}
+                className={cn(
+                  "flex flex-col gap-1 max-w-[85%]",
+                  isAI ? "self-start" : "self-end items-end"
+                )}
+              >
+                <div className={cn("chat-bubble", isAI ? "chat-bubble-ai" : "chat-bubble-user")}>
+                  {isAI && (
+                    <span className="text-xs font-semibold block mb-1" style={{ color: subjectColor }}>
+                      {name.split(' ')[0]}
+                    </span>
+                  )}
                   {message.content}
-                </p>
-              );
-            } else {
-              return (
-                <p key={index} className="text-lg max-sm:text-sm leading-relaxed"
-                  style={{ color: "var(--accent)" }}>
-                  <span className="font-semibold">{userName}:</span>{' '}
-                  {message.content}
-                </p>
-              );
-            }
+                </div>
+                <span className="text-[10px] px-1" style={{ color: "var(--muted-foreground)" }}>
+                  {timestamp}
+                </span>
+              </div>
+            );
           })}
         </div>
         <div className="transcript-fade" />

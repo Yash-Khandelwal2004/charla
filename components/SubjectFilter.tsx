@@ -36,10 +36,11 @@ const SubjectFilter = () => {
   return (
     <Select onValueChange={setSubject} value={subject}>
       <SelectTrigger
-        className="h-fit text-sm px-3 py-2 rounded-md w-[160px]"
+        className="h-fit text-sm px-3 py-2 w-[160px]"
         style={{
-          backgroundColor: "var(--surface-1)",
-          border: "1px solid var(--surface-3)",
+          backgroundColor: "var(--surface-2)",
+          border: "1px solid var(--border)",
+          borderRadius: "6px",
           color: subject && subject !== "all"
             ? "var(--foreground)"
             : "var(--muted-foreground)",
@@ -50,7 +51,7 @@ const SubjectFilter = () => {
       <SelectContent
         style={{
           backgroundColor: "var(--surface-1)",
-          border: "1px solid var(--surface-3)",
+          border: "1px solid var(--border)",
         }}
       >
         <SelectItem

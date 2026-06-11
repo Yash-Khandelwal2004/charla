@@ -1,5 +1,11 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const Subscription = async () => {
   const { userId } = await auth();
@@ -10,7 +16,7 @@ const Subscription = async () => {
       {/* Header */}
       <section className="flex flex-col items-center text-center gap-3">
         <span
-          className="text-xs px-3 py-1 rounded-full font-medium tracking-wide uppercase"
+          className="text-xs px-3 py-1.5 rounded-md font-semibold tracking-wide uppercase"
           style={{
             backgroundColor: "var(--accent-muted)",
             color: "var(--accent)",
@@ -30,28 +36,39 @@ const Subscription = async () => {
 
         {/* Free Plan */}
         <div
-          className="rounded-lg p-6 flex flex-col gap-4"
+          className="p-6 flex flex-col gap-4"
           style={{
             backgroundColor: "var(--surface-1)",
-            border: "1px solid var(--surface-3)",
+            border: "1px solid var(--border)",
+            borderRadius: "10px",
           }}
         >
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold">Free</h2>
+              <h2
+                className="text-xl font-bold"
+                style={{ fontFamily: "var(--font-bricolage)", letterSpacing: "-0.02em" }}
+              >
+                Free
+              </h2>
               <span
                 className="text-xs px-2 py-0.5 rounded-md font-medium"
                 style={{
                   backgroundColor: "var(--surface-2)",
                   color: "var(--muted-foreground)",
-                  border: "1px solid var(--surface-3)",
+                  border: "1px solid var(--border)",
                 }}
               >
                 Current Plan
               </span>
             </div>
             <div className="flex items-end gap-1">
-              <span className="text-3xl font-bold">$0</span>
+              <span
+                className="text-3xl font-bold"
+                style={{ fontFamily: "var(--font-bricolage)", letterSpacing: "-0.02em" }}
+              >
+                $0
+              </span>
               <span className="text-sm pb-1" style={{ color: "var(--muted-foreground)" }}>/month</span>
             </div>
             <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>
@@ -71,7 +88,7 @@ const Subscription = async () => {
               "Bookmarks",
             ].map((feature) => (
               <li key={feature} className="flex items-center gap-2 text-sm">
-                <span style={{ color: "var(--accent)" }}>✓</span>
+                <span style={{ color: "var(--muted-foreground)" }}>✓</span>
                 <span style={{ color: "var(--muted-foreground)" }}>{feature}</span>
               </li>
             ))}
@@ -80,27 +97,38 @@ const Subscription = async () => {
 
         {/* Pro Plan */}
         <div
-          className="rounded-lg p-6 flex flex-col gap-4 relative"
+          className="p-6 flex flex-col gap-4 relative"
           style={{
-            backgroundColor: "var(--surface-2)",
+            backgroundColor: "var(--surface-1)",
             border: "1px solid var(--accent)",
+            borderRadius: "10px",
           }}
         >
           {/* Coming Soon badge */}
           <div
-            className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs px-3 py-1 rounded-full font-medium whitespace-nowrap"
+            className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs px-3 py-1 rounded-full font-semibold whitespace-nowrap"
             style={{
               backgroundColor: "var(--accent)",
-              color: "#fff",
+              color: "#1a1917",
             }}
           >
             Coming Soon
           </div>
 
           <div className="flex flex-col gap-1">
-            <h2 className="text-xl font-bold">Pro</h2>
+            <h2
+              className="text-xl font-bold"
+              style={{ fontFamily: "var(--font-bricolage)", letterSpacing: "-0.02em" }}
+            >
+              Pro
+            </h2>
             <div className="flex items-end gap-1">
-              <span className="text-3xl font-bold">$5</span>
+              <span
+                className="text-3xl font-bold"
+                style={{ fontFamily: "var(--font-bricolage)", letterSpacing: "-0.02em" }}
+              >
+                $5
+              </span>
               <span className="text-sm pb-1" style={{ color: "var(--muted-foreground)" }}>/month</span>
             </div>
             <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>
@@ -130,10 +158,48 @@ const Subscription = async () => {
         </div>
       </section>
 
+      {/* Feature Comparison Table */}
+      <section className="flex flex-col gap-4">
+        <h2 className="section-title">Feature Comparison</h2>
+        <div
+          className="overflow-hidden"
+          style={{
+            border: "1px solid var(--border)",
+            borderRadius: "10px",
+          }}
+        >
+          <table className="w-full text-sm">
+            <thead>
+              <tr style={{ backgroundColor: "var(--surface-1)" }}>
+                <th className="text-left px-4 py-3 font-medium" style={{ color: "var(--muted-foreground)" }}>Feature</th>
+                <th className="text-center px-4 py-3 font-medium" style={{ color: "var(--muted-foreground)" }}>Free</th>
+                <th className="text-center px-4 py-3 font-medium" style={{ color: "var(--accent)" }}>Pro</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { feature: "AI Companions", free: "3", pro: "Unlimited" },
+                { feature: "Tool Uses / Month", free: "10", pro: "Unlimited" },
+                { feature: "AI Tools", free: "All 11", pro: "All 11" },
+                { feature: "Voice Sessions", free: "✓", pro: "✓" },
+                { feature: "Priority Responses", free: "—", pro: "✓" },
+                { feature: "Early Access", free: "—", pro: "✓" },
+              ].map(({ feature, free, pro }) => (
+                <tr key={feature} style={{ borderTop: "1px solid var(--border)" }}>
+                  <td className="px-4 py-3" style={{ color: "var(--foreground)" }}>{feature}</td>
+                  <td className="px-4 py-3 text-center" style={{ color: "var(--muted-foreground)" }}>{free}</td>
+                  <td className="px-4 py-3 text-center" style={{ color: "var(--foreground)" }}>{pro}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section className="flex flex-col gap-4">
         <h2 className="section-title">FAQ</h2>
-        <div className="flex flex-col gap-3">
+        <Accordion type="single" collapsible>
           {[
             {
               q: "What counts as a tool use?",
@@ -147,20 +213,20 @@ const Subscription = async () => {
               q: "When will Pro be available?",
               a: "We're working on payment integration and will launch Pro soon. You'll be notified when it's available.",
             },
-          ].map(({ q, a }) => (
-            <div
-              key={q}
-              className="rounded-lg p-5 flex flex-col gap-2"
-              style={{
-                backgroundColor: "var(--surface-1)",
-                border: "1px solid var(--surface-3)",
-              }}
-            >
-              <p className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>{q}</p>
-              <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>{a}</p>
-            </div>
+          ].map(({ q, a }, i) => (
+            <AccordionItem key={i} value={`faq-${i}`} style={{ borderColor: "var(--border)" }}>
+              <AccordionTrigger
+                className="text-sm font-semibold hover:no-underline"
+                style={{ color: "var(--foreground)" }}
+              >
+                {q}
+              </AccordionTrigger>
+              <AccordionContent>
+                <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>{a}</p>
+              </AccordionContent>
+            </AccordionItem>
           ))}
-        </div>
+        </Accordion>
       </section>
     </main>
   );

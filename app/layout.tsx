@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Inter } from "next/font/google";
+import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 import "./globals.css";
@@ -11,14 +11,15 @@ const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+const dmSans = DM_Sans({
+  variable: "--font-sans",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Charla",
-  description: "Your AI-powered career & learning companion platform",
+  title: "Charla — AI Companion for Career & Learning",
+  description:
+    "Learn from voice-powered AI companions, prep for interviews, scan resumes, review code — everything a student or professional needs, in one place.",
 };
 
 export default function RootLayout({
@@ -28,11 +29,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${bricolage.variable} ${inter.variable} antialiased`}>
+      <body className={`${bricolage.variable} ${dmSans.variable} antialiased`}>
         <ThemeProvider>
           <ClerkProvider appearance={{
             variables: {
-              colorPrimary: '#3b82f6',
+              colorPrimary: '#c49843',
               colorBackground: 'var(--surface-1)',
               colorInputBackground: 'var(--surface-2)',
               colorInputText: 'var(--foreground)',
@@ -41,8 +42,8 @@ export default function RootLayout({
               colorNeutral: 'var(--muted-foreground)',
             },
             elements: {
-              card: { backgroundColor: 'var(--surface-1)', border: '1px solid var(--surface-3)' },
-              formButtonPrimary: { backgroundColor: '#3b82f6' },
+              card: { backgroundColor: 'var(--surface-1)', border: '1px solid var(--border)' },
+              formButtonPrimary: { backgroundColor: '#c49843' },
             }
           }}>
             <Navbar />
@@ -52,9 +53,9 @@ export default function RootLayout({
               toastOptions={{
                 style: {
                   backgroundColor: 'var(--surface-1)',
-                  border: '1px solid var(--surface-3)',
+                  border: '1px solid var(--border)',
                   color: 'var(--foreground)',
-                  fontFamily: 'var(--font-inter)',
+                  fontFamily: 'var(--font-sans)',
                 },
               }}
             />

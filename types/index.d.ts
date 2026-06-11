@@ -61,8 +61,9 @@ interface Avatar {
 }
 
 interface SavedMessage {
-  role: "user" | "system" | "assistant";
+  role: "user" | "assistant";
   content: string;
+  timestamp?: string;
 }
 
 interface CompanionComponentProps {
@@ -224,4 +225,17 @@ interface SkillGapAnalyzerInput {
   target_role: string;
   experience_years?: string;
   timeline?: string;
+}
+
+interface SessionHistory {
+  id: string;
+  companion_id: string;
+  user_id: string;
+  transcript: SavedMessage[];
+  created_at: string;
+  companions?: Companion;
+}
+
+interface ToolUsageWithInput extends ToolUsage {
+  title?: string;
 }

@@ -2,7 +2,6 @@ import CompanionForm from "@/components/CompanionForm";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { newCompanionPermissions } from "@/lib/actions/companion.actions";
-import Image from "next/image";
 import Link from "next/link";
 
 const NewCompanion = async () => {
@@ -25,20 +24,29 @@ const NewCompanion = async () => {
         </article>
       ) : (
         <article className="companion-limit">
-          <Image
-            src="/images/limit.svg"
-            alt="Companion limit reached"
-            width={300}
-            height={200}
-            className="opacity-80"
-          />
+          {/* CSS illustration for limit reached */}
+          <div className="relative w-48 h-32 mx-auto mb-4">
+            <div
+              className="absolute inset-0 rounded-xl"
+              style={{ backgroundColor: "var(--surface-2)", border: "1px dashed var(--border)" }}
+            />
+            <div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-4xl"
+            >
+              🔒
+            </div>
+            <div
+              className="absolute bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full"
+              style={{ backgroundColor: "var(--accent)", opacity: 0.5 }}
+            />
+          </div>
           <div className="cta-badge">Upgrade your plan</div>
-          <h1 className="text-2xl font-bold">You've Reached Your Limit</h1>
+          <h1 className="text-2xl font-bold">You&apos;ve Reached Your Limit</h1>
           <p
             className="text-sm max-w-sm text-center leading-relaxed"
             style={{ color: "var(--muted-foreground)" }}
           >
-            You've reached your companion limit. Upgrade to create more companions and unlock premium features.
+            You&apos;ve reached your companion limit. Upgrade to create more companions and unlock premium features.
           </p>
           <Link href="/subscription" className="w-full max-w-xs">
             <button className="btn-primary w-full justify-center py-3">
@@ -46,7 +54,10 @@ const NewCompanion = async () => {
             </button>
           </Link>
           <Link href="/companions">
-            <span className="text-sm transition-colors" style={{ color: "var(--muted-foreground)" }}>
+            <span
+              className="text-sm transition-colors"
+              style={{ color: "var(--muted-foreground)" }}
+            >
               ← Back to companions
             </span>
           </Link>

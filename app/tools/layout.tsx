@@ -59,7 +59,7 @@ const ToolsLayout = async ({ children }: { children: React.ReactNode }) => {
             <span className="text-5xl">🔒</span>
             <h1 className="text-2xl font-bold">Monthly limit reached</h1>
             <p className="max-w-md" style={{ color: "var(--muted-foreground)" }}>
-              You've used all {limit} free tool uses for this month. Upgrade to Pro for unlimited access.
+              You&apos;ve used all {limit} free tool uses for this month. Upgrade to Pro for unlimited access.
             </p>
             <div className="flex gap-3">
               <Link href="/subscription">

@@ -5,8 +5,8 @@ export default function GlobalError({ error }: { error: Error & { digest?: strin
     <html>
       <body
         style={{
-          backgroundColor: "#080808",
-          color: "#f0f0f0",
+          backgroundColor: "#0f0e0d",
+          color: "#f5f0e8",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -17,7 +17,7 @@ export default function GlobalError({ error }: { error: Error & { digest?: strin
         }}
       >
         <h1 style={{ fontSize: "24px", fontWeight: "bold" }}>Something went wrong</h1>
-        <p style={{ color: "#666666", fontSize: "14px" }}>
+        <p style={{ color: "#8a8480", fontSize: "14px" }}>
           {error?.message || "An unexpected error occurred."}
         </p>
         <button
@@ -25,8 +25,8 @@ export default function GlobalError({ error }: { error: Error & { digest?: strin
           style={{
             marginTop: "8px",
             padding: "8px 20px",
-            backgroundColor: "#a855f7",
-            color: "#fff",
+            backgroundColor: "#d4a853",
+            color: "#1a1917",
             border: "none",
             borderRadius: "8px",
             cursor: "pointer",

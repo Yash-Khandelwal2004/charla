@@ -26,7 +26,13 @@ const formSchema = z.object({
 });
 
 // Shared label style
-const labelStyle = { color: "var(--foreground)", fontSize: "0.8125rem" };
+const labelStyle: React.CSSProperties = {
+  color: "var(--foreground)",
+  fontSize: "13px",
+  fontWeight: 500,
+  marginBottom: "6px",
+  display: "block",
+};
 
 const CompanionForm = () => {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -42,8 +48,12 @@ const CompanionForm = () => {
 
   return (
     <div
-      className="rounded-lg p-6 max-w-2xl w-full mx-auto"
-      style={{ backgroundColor: "var(--surface-1)", border: "1px solid var(--surface-3)" }}
+      className="p-6 max-w-2xl w-full mx-auto"
+      style={{
+        backgroundColor: "var(--surface-1)",
+        border: "1px solid var(--border)",
+        borderRadius: "10px",
+      }}
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
@@ -59,6 +69,8 @@ const CompanionForm = () => {
             </FormItem>
           )} />
 
+          <div className="w-full h-px" style={{ backgroundColor: "var(--border)" }} />
+
           {/* Subject */}
           <FormField control={form.control} name="subject" render={({ field }) => (
             <FormItem>
@@ -68,7 +80,7 @@ const CompanionForm = () => {
                   <SelectTrigger className="input capitalize">
                     <SelectValue placeholder="Select subject" />
                   </SelectTrigger>
-                  <SelectContent style={{ backgroundColor: "var(--surface-1)", borderColor: "var(--surface-3)" }}>
+                  <SelectContent style={{ backgroundColor: "var(--surface-1)", borderColor: "var(--border)" }}>
                     {subjects.map((s) => (
                       <SelectItem key={s} value={s} className="capitalize"
                         style={{ color: "var(--foreground)" }}>
@@ -94,6 +106,8 @@ const CompanionForm = () => {
             </FormItem>
           )} />
 
+          <div className="w-full h-px" style={{ backgroundColor: "var(--border)" }} />
+
           {/* Voice + Style side by side */}
           <div className="grid grid-cols-2 gap-4">
             <FormField control={form.control} name="voice" render={({ field }) => (
@@ -104,7 +118,7 @@ const CompanionForm = () => {
                     <SelectTrigger className="input">
                       <SelectValue placeholder="Select voice" />
                     </SelectTrigger>
-                    <SelectContent style={{ backgroundColor: "var(--surface-1)", borderColor: "var(--surface-3)" }}>
+                    <SelectContent style={{ backgroundColor: "var(--surface-1)", borderColor: "var(--border)" }}>
                       <SelectItem value="male" style={{ color: "var(--foreground)" }}>Male</SelectItem>
                       <SelectItem value="female" style={{ color: "var(--foreground)" }}>Female</SelectItem>
                     </SelectContent>
@@ -122,7 +136,7 @@ const CompanionForm = () => {
                     <SelectTrigger className="input">
                       <SelectValue placeholder="Select style" />
                     </SelectTrigger>
-                    <SelectContent style={{ backgroundColor: "var(--surface-1)", borderColor: "var(--surface-3)" }}>
+                    <SelectContent style={{ backgroundColor: "var(--surface-1)", borderColor: "var(--border)" }}>
                       <SelectItem value="formal" style={{ color: "var(--foreground)" }}>Formal</SelectItem>
                       <SelectItem value="casual" style={{ color: "var(--foreground)" }}>Casual</SelectItem>
                     </SelectContent>
@@ -148,6 +162,7 @@ const CompanionForm = () => {
           <button
             type="submit"
             className="btn-primary w-full justify-center py-3 mt-2"
+            style={{ height: "44px" }}
           >
             Build Companion →
           </button>

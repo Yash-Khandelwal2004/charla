@@ -24,10 +24,11 @@ const CompanionSession = async ({ params }: CompanionSessionPageProps) => {
     <main>
       {/* Session header */}
       <article
-        className="flex justify-between items-center p-5 rounded-xl max-md:flex-col max-md:gap-4 max-md:items-start"
+        className="flex justify-between items-center p-5 max-md:flex-col max-md:gap-4 max-md:items-start"
         style={{
           backgroundColor: "var(--surface-1)",
-          border: "1px solid var(--surface-3)",
+          border: "1px solid var(--border)",
+          borderRadius: "10px",
         }}
       >
         <div className="flex items-center gap-3">
@@ -44,7 +45,14 @@ const CompanionSession = async ({ params }: CompanionSessionPageProps) => {
 
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <p className="font-bold text-xl" style={{ color: "var(--foreground)" }}>
+              <p
+                className="font-bold text-xl"
+                style={{
+                  color: "var(--foreground)",
+                  fontFamily: "var(--font-bricolage)",
+                  letterSpacing: "-0.02em",
+                }}
+              >
                 {name}
               </p>
               <span

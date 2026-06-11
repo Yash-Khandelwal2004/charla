@@ -3,6 +3,7 @@ import { removeBookmark, addBookmark } from "@/lib/actions/companion.actions";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Clock } from "lucide-react";
 
 interface CompanionCardProps {
   id: string;
@@ -40,10 +41,11 @@ const CompanionCard = ({
     >
       <div className="flex justify-between items-center">
         {/* Subject badge with small colored dot */}
-        <span className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md capitalize font-medium"
+        <span
+          className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md capitalize font-medium"
           style={{
             backgroundColor: "var(--surface-2)",
-            border: "1px solid var(--surface-3)",
+            border: "1px solid var(--border)",
             color: color,
           }}
         >
@@ -70,33 +72,37 @@ const CompanionCard = ({
       <div className="flex flex-col gap-1">
         <h2
           className="text-lg font-bold leading-tight"
-          style={{ color: "var(--foreground)", fontFamily: "var(--font-bricolage)" }}
+          style={{
+            color: "var(--foreground)",
+            fontFamily: "var(--font-bricolage)",
+            letterSpacing: "-0.02em",
+          }}
         >
           {name}
         </h2>
-        <p className="text-sm line-clamp-2" style={{ color: "var(--muted-foreground)" }}>
+        <p
+          className="text-[13px] line-clamp-1"
+          style={{ color: "var(--muted-foreground)" }}
+        >
           {topic}
         </p>
       </div>
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <Image
-            src="/icons/clock.svg"
-            alt="duration"
-            width={13}
-            height={13}
-            className="opacity-50"
-          />
+          <Clock size={13} style={{ color: "var(--muted-foreground)" }} />
           <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>
             {duration} min
           </span>
         </div>
 
         <Link href={`/companions/${id}`}>
-          <button className="btn-primary text-xs py-1.5">
-            Launch →
-          </button>
+          <span
+            className="text-xs font-medium cursor-pointer"
+            style={{ color: "var(--accent)" }}
+          >
+            Start Session →
+          </span>
         </Link>
       </div>
     </article>
