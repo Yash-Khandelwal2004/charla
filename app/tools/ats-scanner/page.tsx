@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { runATSScanner } from "@/lib/actions/tools.actions";
 import ToolOutput from "@/components/ToolOutput";
 import ToolPageWrapper from "@/components/ToolPageWrapper";
+import FileUpload from "@/components/FileUpload";
 
 const ATSScanner = () => {
   const [resume, setResume] = useState("");
@@ -29,16 +30,50 @@ const ATSScanner = () => {
   // Left column — inputs
   const inputPanel = (
     <div className="flex flex-col gap-4">
+
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium" style={{ color: "var(--foreground)" }}>Your Resume</label>
-        <textarea className="input min-h-[240px] resize-none" placeholder="Paste your full resume text here..."
-          value={resume} onChange={(e) => setResume(e.target.value)} />
+        <label className="text-sm font-medium" style={{ color: "var(--foreground)" }}>
+          Your Resume
+        </label>
+
+        <div
+          className="flex flex-col gap-3 rounded-xl p-3"
+          style={{
+            backgroundColor: "var(--surface-1)",
+            border: "1px solid var(--border)",
+          }}
+        >
+          <FileUpload
+            label="Upload your resume (PDF or DOCX)"
+            onExtract={(text) => setResume(text)}
+          />
+
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px" style={{ backgroundColor: "var(--border)" }} />
+            <span
+              className="text-xs font-semibold tracking-wide"
+              style={{ color: "var(--muted-foreground)" }}
+            >
+              OR PASTE TEXT
+            </span>
+            <div className="flex-1 h-px" style={{ backgroundColor: "var(--border)" }} />
+          </div>
+
+          <textarea
+            className="input min-h-[200px] resize-none"
+            placeholder="Paste your full resume text here..."
+            value={resume}
+            onChange={(e) => setResume(e.target.value)}
+          />
+        </div>
       </div>
+
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-medium" style={{ color: "var(--foreground)" }}>Job Description</label>
         <textarea className="input min-h-[240px] resize-none" placeholder="Paste the job description here..."
           value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} />
       </div>
+
       <button className="btn-primary justify-center w-full py-3" onClick={handleSubmit}
         disabled={loading || !resume.trim() || !jobDescription.trim()}
         style={{ opacity: loading || !resume.trim() || !jobDescription.trim() ? 0.5 : 1 }}>

@@ -38,6 +38,11 @@ const CompanionsList = ({ title, companions, classNames }: CompanionsListProps) 
     );
   }
 
+
+  const uniqueCompanions = Array.from(
+    new Map(companions.map((c) => [c.id, c])).values()
+  );
+
   return (
     <article className={cn("companion-list", classNames)}>
       <h2
@@ -70,7 +75,7 @@ const CompanionsList = ({ title, companions, classNames }: CompanionsListProps) 
           </TableRow>
         </TableHeader>
         <TableBody>
-          {companions.map(({ id, subject, name, topic, duration }) => {
+          {uniqueCompanions.map(({ id, subject, name, topic, duration }) => {
             const color = getSubjectColor(subject);
             return (
               <TableRow
