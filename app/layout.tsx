@@ -17,9 +17,13 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Charla — AI Companion for Career & Learning",
-  description:
-    "Learn from voice-powered AI companions, prep for interviews, scan resumes, review code — everything a student or professional needs, in one place.",
+  title: "Charla — Your AI companion from campus to career",
+  description: "AI-powered voice companions and career tools for students.",
+  icons: {
+    icon: "/logo.svg",
+    shortcut: "/logo.svg",
+    apple: "/logo.svg",
+  },
 };
 
 export default function RootLayout({

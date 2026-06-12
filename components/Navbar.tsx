@@ -5,6 +5,7 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import NavItems from "@/components/NavItems";
 import ThemeToggle from "@/components/ThemeToggle";
+import Image from "next/image";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -15,18 +16,14 @@ const Navbar = () => {
         {/* Logo */}
         <Link href="/">
           <div className="flex items-center gap-2.5 cursor-pointer">
-            {/* Logo mark — geometric CH monogram */}
-            <div
-              className="w-8 h-8 flex items-center justify-center rounded-md text-xs font-bold"
-              style={{
-                backgroundColor: "var(--accent)",
-                color: "#1a1917",
-                fontFamily: "var(--font-bricolage)",
-                letterSpacing: "-0.03em",
-              }}
-            >
-              CH
-            </div>
+            <Image
+              src="/images/logo.svg"
+              alt="Charla logo"
+              width={32}
+              height={32}
+              className="w-8 h-8"
+              priority
+            />
             <span
               className="font-bold text-lg max-sm:hidden"
               style={{
@@ -112,6 +109,7 @@ const Navbar = () => {
             { label: "Home", href: "/" },
             { label: "Companions", href: "/companions" },
             { label: "Tools", href: "/tools" },
+            { label: "History", href: "/history" },
             { label: "My Journey", href: "/my-journey" },
           ].map(({ label, href }) => (
             <Link
