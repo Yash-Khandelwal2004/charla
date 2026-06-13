@@ -56,11 +56,11 @@ const PlagiarismRewriter = () => {
                 onClick={() => update("style", value)}
                 className="flex flex-col gap-1 p-3 rounded-lg text-left transition-all duration-150"
                 style={{
-                  backgroundColor: form.style === value ? "var(--primary-muted)" : "var(--surface-2)",
-                  border: `1px solid ${form.style === value ? "var(--primary)" : "var(--surface-3)"}`,
+                  backgroundColor: form.style === value ? "var(--accent-muted)" : "var(--surface-2)",
+                  border: `1px solid ${form.style === value ? "var(--accent)" : "var(--surface-3)"}`,
                 }}
               >
-                <span className="text-sm font-medium" style={{ color: form.style === value ? "var(--primary)" : "var(--foreground)" }}>
+                <span className="text-sm font-medium" style={{ color: form.style === value ? "var(--accent)" : "var(--foreground)" }}>
                   {label}
                 </span>
                 <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>{desc}</span>
