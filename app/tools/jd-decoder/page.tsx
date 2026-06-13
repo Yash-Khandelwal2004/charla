@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { runJDDecoder } from "@/lib/actions/tools.actions";
 import ToolOutput from "@/components/ToolOutput";
 import ToolPageWrapper from "@/components/ToolPageWrapper";
+import FileUpload from "@/components/FileUpload";
 
 const JDDecoder = () => {
   const [jobDescription, setJobDescription] = useState("");
@@ -38,13 +39,36 @@ const JDDecoder = () => {
           <label className="text-sm font-medium" style={{ color: "var(--foreground)" }}>
             Job Description
           </label>
-          <textarea
-            className="input min-h-[400px] max-sm:min-h-[240px] resize-none"
-            placeholder="Paste the full job description here..."
-            value={jobDescription}
-            onChange={(e) => setJobDescription(e.target.value)}
-          />
+
+          <div
+            className="flex flex-col gap-3 rounded-xl p-3"
+            style={{ backgroundColor: "var(--surface-1)", border: "1px solid var(--border)" }}
+          >
+            <FileUpload
+              label="Upload the job posting (PDF or DOCX)"
+              onExtract={(text) => setJobDescription(text)}
+            />
+
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px" style={{ backgroundColor: "var(--border)" }} />
+              <span
+                className="text-xs font-semibold tracking-wide"
+                style={{ color: "var(--muted-foreground)" }}
+              >
+                OR PASTE TEXT
+              </span>
+              <div className="flex-1 h-px" style={{ backgroundColor: "var(--border)" }} />
+            </div>
+
+            <textarea
+              className="input min-h-[320px] max-sm:min-h-[200px] resize-none"
+              placeholder="Paste the full job description here..."
+              value={jobDescription}
+              onChange={(e) => setJobDescription(e.target.value)}
+            />
+          </div>
         </div>
+
         <button className="btn-primary justify-center w-full py-3" onClick={handleSubmit}
           disabled={loading || !jobDescription.trim()}
           style={{ opacity: loading || !jobDescription.trim() ? 0.5 : 1 }}>

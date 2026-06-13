@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { runResumeBuilder } from "@/lib/actions/tools.actions";
 import ToolOutput from "@/components/ToolOutput";
 import ToolPageWrapper from "@/components/ToolPageWrapper";
+import FileUpload from "@/components/FileUpload";
 
 const ResumeBuilder = () => {
   const [form, setForm] = useState({
@@ -40,6 +41,26 @@ const ResumeBuilder = () => {
     >
       {/* Input panel */}
       <div className="flex flex-col gap-4">
+
+        {/* Optional resume import */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium" style={{ color: "var(--foreground)" }}>
+            Already have a resume? <span style={{ color: "var(--muted-foreground)", fontWeight: 400 }}>(optional)</span>
+          </label>
+          <div
+            className="flex flex-col gap-2 rounded-xl p-3"
+            style={{ backgroundColor: "var(--surface-1)", border: "1px solid var(--border)" }}
+          >
+            <FileUpload
+              label="Upload an existing resume (PDF or DOCX)"
+              onExtract={(text) => update("experience", text)}
+            />
+            <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+              We'll drop the extracted text into "Work Experience" below — edit it however you like before generating.
+            </p>
+          </div>
+        </div>
+
         <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
           {[
             { key: "full_name", label: "Full Name", placeholder: "John Doe" },

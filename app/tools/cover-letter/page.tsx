@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { runCoverLetter } from "@/lib/actions/tools.actions";
 import ToolOutput from "@/components/ToolOutput";
 import ToolPageWrapper from "@/components/ToolPageWrapper";
+import FileUpload from "@/components/FileUpload";
 
 const CoverLetter = () => {
   const [form, setForm] = useState({
@@ -44,6 +45,7 @@ const CoverLetter = () => {
           <input className="input" placeholder="Google, Stripe, etc."
             value={form.company_name} onChange={(e) => update("company_name", e.target.value)} />
         </div>
+
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium" style={{ color: "var(--foreground)" }}>Tone</label>
           <select className="input" value={form.tone} onChange={(e) => update("tone", e.target.value)}>
@@ -52,16 +54,57 @@ const CoverLetter = () => {
             <option value="enthusiastic">Enthusiastic</option>
           </select>
         </div>
+
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium" style={{ color: "var(--foreground)" }}>Your Resume / Background</label>
-          <textarea className="input min-h-[160px] resize-none" placeholder="Paste your resume or key experience..."
-            value={form.resume} onChange={(e) => update("resume", e.target.value)} />
+
+          <div
+            className="flex flex-col gap-3 rounded-xl p-3"
+            style={{ backgroundColor: "var(--surface-1)", border: "1px solid var(--border)" }}
+          >
+            <FileUpload
+              label="Upload your resume (PDF or DOCX)"
+              onExtract={(text) => update("resume", text)}
+            />
+
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px" style={{ backgroundColor: "var(--border)" }} />
+              <span className="text-xs font-semibold tracking-wide" style={{ color: "var(--muted-foreground)" }}>
+                OR PASTE TEXT
+              </span>
+              <div className="flex-1 h-px" style={{ backgroundColor: "var(--border)" }} />
+            </div>
+
+            <textarea className="input min-h-[140px] resize-none" placeholder="Paste your resume or key experience..."
+              value={form.resume} onChange={(e) => update("resume", e.target.value)} />
+          </div>
         </div>
+
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium" style={{ color: "var(--foreground)" }}>Job Description</label>
-          <textarea className="input min-h-[160px] resize-none" placeholder="Paste the job description..."
-            value={form.job_description} onChange={(e) => update("job_description", e.target.value)} />
+
+          <div
+            className="flex flex-col gap-3 rounded-xl p-3"
+            style={{ backgroundColor: "var(--surface-1)", border: "1px solid var(--border)" }}
+          >
+            <FileUpload
+              label="Upload the job posting (PDF or DOCX)"
+              onExtract={(text) => update("job_description", text)}
+            />
+
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px" style={{ backgroundColor: "var(--border)" }} />
+              <span className="text-xs font-semibold tracking-wide" style={{ color: "var(--muted-foreground)" }}>
+                OR PASTE TEXT
+              </span>
+              <div className="flex-1 h-px" style={{ backgroundColor: "var(--border)" }} />
+            </div>
+
+            <textarea className="input min-h-[140px] resize-none" placeholder="Paste the job description..."
+              value={form.job_description} onChange={(e) => update("job_description", e.target.value)} />
+          </div>
         </div>
+
         <button className="btn-primary justify-center w-full py-3" onClick={handleSubmit}
           disabled={loading || !isValid} style={{ opacity: loading || !isValid ? 0.5 : 1 }}>
           {loading ? "Writing..." : "Generate Cover Letter →"}
