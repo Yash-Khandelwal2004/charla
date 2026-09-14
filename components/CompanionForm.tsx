@@ -99,7 +99,7 @@ const CompanionForm = () => {
             <FormItem>
               <FormLabel style={labelStyle}>What should the companion help with?</FormLabel>
               <FormControl>
-                <Textarea placeholder="e.g. Derivatives & Integrals, World War II causes..." {...field}
+                <Textarea placeholder="e.g. Derivatives & Integrals, Binary Search..." {...field}
                   className="input min-h-[100px] resize-none" />
               </FormControl>
               <FormMessage className="text-xs" />

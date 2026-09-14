@@ -1,21 +1,31 @@
+
 // ── Subjects ───────────────────────────────────────────
 export const subjects = [
-  "maths",
-  "language",
-  "science",
-  "history",
-  "coding",
-  "economics",
+  "dsa",
+  "dbms",
+  "os",
+  "networks",
+  "oop",
+  "system-design",
 ];
 
-// Muted subject accent colors (for both light and dark)
+export const subjectLabels: Record<string, string> = {
+  "dsa": "Data Structures & Algorithms",
+  "dbms": "Database Management Systems",
+  "os": "Operating Systems",
+  "networks": "Computer Networks",
+  "oop": "Object-Oriented Programming",
+  "system-design": "System Design",
+};
+
+// Muted subject accent colors 
 export const subjectsColors: Record<string, string> = {
-  science:   "#7c3aed",   // muted violet
-  maths:     "#d97706",   // muted amber
-  language:  "#0284c7",   // muted sky
-  coding:    "#db2777",   // muted pink
-  history:   "#ea580c",   // muted orange
-  economics: "#059669",   // muted emerald
+  "dsa":           "#d97706",   // muted amber
+  "dbms":          "#7c3aed",   // muted violet
+  "os":            "#db2777",   // muted pink
+  "networks":      "#0284c7",   // muted sky
+  "oop":           "#059669",   // muted emerald
+  "system-design": "#ea580c",   // muted orange
 };
 
 // ── VAPI Voices ────────────────────────────────────────
@@ -155,50 +165,50 @@ export type ToolCategory = "career" | "academic" | "productivity";
 export const recentSessions = [
   {
     id: "1",
-    subject: "science",
-    name: "Neura the Brainy Explorer",
-    topic: "Neural Network of the Brain",
+    subject: "dsa",
+    name: "Codey the Algorithm Ace",
+    topic: "Binary Trees & Traversals",
     duration: 45,
-    color: "#c084fc",
+    color: "#d97706",
   },
   {
     id: "2",
-    subject: "maths",
-    name: "Countsy the Number Wizard",
-    topic: "Derivatives & Integrals",
+    subject: "dbms",
+    name: "Query the Data Wizard",
+    topic: "Normalization & Joins",
     duration: 30,
-    color: "#fbbf24",
+    color: "#7c3aed",
   },
   {
     id: "3",
-    subject: "language",
-    name: "Verba the Vocabulary Builder",
-    topic: "English Literature",
+    subject: "os",
+    name: "Kernel the Process Manager",
+    topic: "Deadlocks & Scheduling",
     duration: 30,
-    color: "#38bdf8",
+    color: "#db2777",
   },
   {
     id: "4",
-    subject: "coding",
-    name: "Codey the Logic Hacker",
-    topic: "Intro to If-Else Statements",
+    subject: "networks",
+    name: "Packet the Protocol Guide",
+    topic: "TCP/IP & the OSI Model",
     duration: 45,
-    color: "#f472b6",
+    color: "#0284c7",
   },
   {
     id: "5",
-    subject: "history",
-    name: "Memo the Memory Keeper",
-    topic: "World Wars: Causes & Consequences",
+    subject: "oop",
+    name: "Classy the Object Builder",
+    topic: "Inheritance & Polymorphism",
     duration: 15,
-    color: "#fb923c",
+    color: "#059669",
   },
   {
     id: "6",
-    subject: "economics",
-    name: "The Market Maestro",
-    topic: "The Basics of Supply & Demand",
+    subject: "system-design",
+    name: "Archie the System Architect",
+    topic: "Load Balancing & Caching",
     duration: 10,
-    color: "#34d399",
+    color: "#ea580c",
   },
 ];
