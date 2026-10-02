@@ -1,0 +1,173 @@
+
+
+.iv-page {
+  --iv-line: color-mix(in srgb, currentColor 14%, transparent);
+  --iv-soft: color-mix(in srgb, currentColor 6%, transparent);
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.iv-title { font-size: 1.85rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; }
+.iv-lede { margin-top: 0.5rem; max-width: 62ch; opacity: 0.72; line-height: 1.6; }
+.iv-h2 { font-size: 1.15rem; font-weight: 650; margin-bottom: 0.75rem; }
+.iv-muted { opacity: 0.68; }
+.iv-small { font-size: 0.85rem; }
+
+.iv-card {
+  background: var(--surface-1);
+  border: 1px solid var(--iv-line);
+  border-radius: 14px;
+  padding: 1.25rem;
+}
+.iv-section { margin-top: 2rem; }
+.iv-stack > * + * { margin-top: 0.75rem; }
+
+/* ---------- setup ---------- */
+.iv-grid-jobs { display: grid; gap: 0.6rem; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.iv-choice {
+  text-align: left; width: 100%;
+  background: var(--surface-1); color: inherit;
+  border: 1px solid var(--iv-line); border-radius: 12px;
+  padding: 0.85rem 0.95rem; cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+.iv-choice:hover { border-color: color-mix(in srgb, currentColor 35%, transparent); }
+.iv-choice[aria-checked='true'] {
+  border-color: var(--accent);
+  background: var(--accent-muted);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.iv-choice-title { font-weight: 600; font-size: 0.95rem; }
+.iv-choice-sub { font-size: 0.8rem; opacity: 0.68; margin-top: 0.2rem; line-height: 1.4; }
+
+.iv-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.iv-pill { width: auto; padding: 0.55rem 0.9rem; border-radius: 999px; }
+
+.iv-label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem; }
+.iv-input, .iv-textarea {
+  width: 100%; background: var(--surface-1); color: inherit;
+  border: 1px solid var(--iv-line); border-radius: 10px; padding: 0.65rem 0.8rem; font: inherit;
+}
+.iv-textarea { min-height: 150px; resize: vertical; line-height: 1.5; }
+.iv-input:focus-visible, .iv-textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.iv-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  border-radius: 10px; padding: 0.75rem 1.25rem; font: inherit; font-weight: 650;
+  cursor: pointer; border: 1px solid transparent; text-decoration: none;
+  transition: opacity 0.15s, transform 0.05s;
+}
+.iv-btn:active { transform: translateY(1px); }
+.iv-btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+.iv-btn-primary { background: var(--accent); color: #1c1305; }
+.iv-btn-primary:hover:not([disabled]) { opacity: 0.9; }
+.iv-btn-ghost { background: transparent; color: inherit; border-color: var(--iv-line); }
+.iv-btn-ghost:hover:not([disabled]) { border-color: color-mix(in srgb, currentColor 40%, transparent); }
+.iv-btn-danger { background: #dc2626; color: #fff; }
+.iv-btn:focus-visible, .iv-choice:focus-visible, .iv-link:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+
+.iv-error {
+  border: 1px solid #ef4444; background: color-mix(in srgb, #ef4444 12%, transparent);
+  border-radius: 10px; padding: 0.7rem 0.9rem; font-size: 0.9rem;
+}
+.iv-notice {
+  border: 1px solid var(--iv-line); background: var(--iv-soft);
+  border-radius: 10px; padding: 0.7rem 0.9rem; font-size: 0.9rem; line-height: 1.5;
+}
+
+.iv-setup-layout { display: grid; gap: 1.5rem; }
+@media (min-width: 900px) { .iv-setup-layout { grid-template-columns: 1fr 320px; align-items: start; } }
+.iv-sticky { position: sticky; top: 1rem; }
+
+/* ---------- history list ---------- */
+.iv-list { list-style: none; padding: 0; margin: 0; }
+.iv-list li + li { border-top: 1px solid var(--iv-line); }
+.iv-link-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 0.8rem 0.25rem; color: inherit; text-decoration: none;
+}
+.iv-link-row:hover .iv-link-title { text-decoration: underline; }
+.iv-badge {
+  min-width: 3.1rem; text-align: center; font-weight: 700; font-size: 0.9rem;
+  border-radius: 8px; padding: 0.25rem 0.5rem; border: 1px solid var(--iv-line);
+}
+
+/* ---------- live room ---------- */
+.iv-room { display: grid; gap: 1.5rem; justify-items: center; text-align: center; padding-top: 1rem; }
+.iv-orb-wrap { position: relative; width: 150px; height: 150px; display: grid; place-items: center; }
+.iv-orb {
+  width: 110px; height: 110px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 2rem; font-weight: 700;
+  background: var(--accent-muted); color: inherit; border: 2px solid var(--accent);
+}
+.iv-orb-ring {
+  position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--accent);
+  opacity: 0; transform: scale(0.75);
+}
+.iv-orb-wrap[data-speaking='true'] .iv-orb-ring { animation: iv-pulse 1.4s ease-out infinite; }
+@keyframes iv-pulse {
+  0% { opacity: 0.55; transform: scale(0.75); }
+  100% { opacity: 0; transform: scale(1.15); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .iv-orb-wrap[data-speaking='true'] .iv-orb-ring { animation: none; opacity: 0.45; transform: scale(1); }
+}
+
+.iv-clock { font-size: 2.6rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.iv-clock[data-low='true'] { color: #ef4444; }
+.iv-progress { width: min(360px, 90vw); height: 6px; border-radius: 999px; background: var(--iv-line); overflow: hidden; }
+.iv-progress > span { display: block; height: 100%; background: var(--accent); transition: width 0.5s linear; }
+.iv-controls { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; }
+
+.iv-captions {
+  width: min(680px, 100%); text-align: left; max-height: 220px; overflow-y: auto;
+  border: 1px solid var(--iv-line); border-radius: 12px; padding: 0.85rem 1rem; background: var(--surface-1);
+  font-size: 0.92rem; line-height: 1.55;
+}
+.iv-captions p + p { margin-top: 0.5rem; }
+.iv-captions .who { font-weight: 650; margin-right: 0.35rem; }
+
+/* ---------- report ---------- */
+.iv-hero { display: grid; gap: 1.5rem; align-items: center; }
+@media (min-width: 720px) { .iv-hero { grid-template-columns: 220px 1fr; } }
+.iv-ring { position: relative; width: 200px; height: 200px; margin: 0 auto; }
+.iv-ring svg { transform: rotate(-90deg); }
+.iv-ring-center { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+.iv-score { font-size: 3.4rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.iv-score-of { font-size: 0.85rem; opacity: 0.65; margin-top: 0.15rem; }
+.iv-verdict { font-size: 1.5rem; font-weight: 750; }
+
+.iv-dim + .iv-dim { margin-top: 1rem; }
+.iv-dim-head { display: flex; justify-content: space-between; gap: 1rem; font-weight: 600; font-size: 0.95rem; }
+.iv-bar { height: 8px; border-radius: 999px; background: var(--iv-line); margin: 0.4rem 0; overflow: hidden; }
+.iv-bar > span { display: block; height: 100%; border-radius: 999px; }
+
+.iv-two-col { display: grid; gap: 1rem; }
+@media (min-width: 720px) { .iv-two-col { grid-template-columns: 1fr 1fr; } }
+.iv-bullets { padding-left: 1.1rem; margin: 0; line-height: 1.55; }
+.iv-bullets li + li { margin-top: 0.45rem; }
+
+.iv-q { padding: 1rem 0; }
+.iv-q + .iv-q { border-top: 1px solid var(--iv-line); }
+.iv-q-head { display: flex; gap: 0.75rem; justify-content: space-between; align-items: flex-start; }
+.iv-q-title { font-weight: 650; line-height: 1.4; }
+.iv-rate { font-size: 0.78rem; font-weight: 700; border-radius: 999px; padding: 0.15rem 0.6rem; border: 1px solid; white-space: nowrap; }
+.iv-rate[data-r='weak'] { color: #ef4444; }
+.iv-rate[data-r='okay'] { color: #f59e0b; }
+.iv-rate[data-r='strong'] { color: #22c55e; }
+.iv-q dl { margin: 0.6rem 0 0; display: grid; gap: 0.5rem; font-size: 0.92rem; line-height: 1.55; }
+.iv-q dt { font-weight: 650; }
+.iv-q dd { margin: 0; opacity: 0.85; }
+
+.iv-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; }
+.iv-metric { border: 1px solid var(--iv-line); border-radius: 10px; padding: 0.7rem 0.85rem; }
+.iv-metric b { display: block; font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+.iv-metric span { font-size: 0.8rem; opacity: 0.68; }
+
+.iv-priority { font-weight: 700; margin-right: 0.35rem; }
+.iv-details summary { cursor: pointer; font-weight: 650; }
+.iv-transcript p { margin: 0.5rem 0 0; line-height: 1.55; font-size: 0.92rem; }
+.iv-transcript .who { font-weight: 650; }
