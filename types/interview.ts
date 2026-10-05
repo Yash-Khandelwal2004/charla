@@ -1,3 +1,4 @@
+
 export type ExperienceLevel = 'fresher' | 'junior' | 'mid';
 export type InterviewFocus = 'technical' | 'behavioral' | 'mixed';
 export type InterviewStatus = 'in_progress' | 'completed' | 'assessment_failed';
@@ -21,14 +22,14 @@ export interface InterviewMetrics {
   candidateWords: number;
   avgWordsPerAnswer: number;
   longestAnswerWords: number;
-  shortAnswers: number;
+  shortAnswers: number; // answers under 15 words
   talkRatio: number; 
   fillerCount: number;
   hedgeCount: number;
   dontKnowCount: number;
   elapsedSeconds: number;
   plannedSeconds: number;
-  completionRatio: number; 
+  completionRatio: number; // 0..1
 }
 
 export type DimensionKey =
@@ -39,7 +40,7 @@ export type DimensionKey =
   | 'professionalism';
 
 export interface DimensionScore {
-  score: number;
+  score: number; // 0..100
   evidence: string;
 }
 
@@ -67,8 +68,8 @@ export type InterviewVerdict =
   | 'Not ready';
 
 export interface InterviewAssessment {
-  overallScore: number;
-  rawScore: number; 
+  overallScore: number; 
+  rawScore: number;
   capReason: string | null;
   verdict: InterviewVerdict;
   dimensions: Record<DimensionKey, DimensionScore>;
@@ -109,6 +110,22 @@ export interface InterviewListItem {
   started_at: string | null;
   score: number | null;
   created_at: string;
+}
+
+export interface InterviewHistoryItem {
+  id: string;
+  job_title: string;
+  experience_level: ExperienceLevel;
+  focus: InterviewFocus;
+  duration_minutes: number;
+  status: InterviewStatus;
+  score: number | null;
+  elapsed_seconds: number | null;
+  created_at: string;
+  verdict: InterviewVerdict | null;
+  summary: string | null;
+  plan: ActionItem[];
+  weaknesses: string[];
 }
 
 export type ActionResult<T extends object = object> =

@@ -1,4 +1,3 @@
-
 import '../interview.css';
 import Link from 'next/link';
 import { auth } from '@clerk/nextjs/server';

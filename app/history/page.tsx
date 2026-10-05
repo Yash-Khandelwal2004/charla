@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,9 +8,16 @@ import { useUser } from "@clerk/nextjs";
 import { tools } from "@/constants";
 import Link from "next/link";
 import SessionInsightsView from "@/components/SessionInsights";
+import InterviewHistoryList from "@/components/interview/InterviewHistoryList";
 
-type Tab = "tools" | "sessions";
+type Tab = "tools" | "sessions" | "interviews";
 type ToolFilter = "all" | string;
+
+const TAB_LABELS: Record<Tab, (counts: { tools: number; sessions: number }) => string> = {
+  tools: (c) => `Tool History (${c.tools})`,
+  sessions: (c) => `Conversations (${c.sessions})`,
+  interviews: () => "Interviews",
+};
 
 const formatDate = (dateStr: string) => {
   return new Date(dateStr).toLocaleDateString("en-IN", {
@@ -167,7 +175,8 @@ const HistoryPage = () => {
       <section className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight">History</h1>
         <p style={{ color: "var(--text-secondary)" }} className="text-sm">
-          All your tool runs and companion conversations in one place.
+          All your tool runs, companion conversations and mock interviews in
+          one place.
         </p>
       </section>
 
@@ -178,7 +187,7 @@ const HistoryPage = () => {
         className="flex gap-0 border-b"
         style={{ borderColor: "var(--border-default)" }}
       >
-        {(["tools", "sessions"] as Tab[]).map((tab) => (
+        {(["tools", "sessions", "interviews"] as Tab[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -194,9 +203,10 @@ const HistoryPage = () => {
                   : "2px solid transparent",
             }}
           >
-            {tab === "tools"
-              ? `Tool History (${toolHistory.length})`
-              : `Conversations (${sessionHistory.length})`}
+            {TAB_LABELS[tab]({
+              tools: toolHistory.length,
+              sessions: sessionHistory.length,
+            })}
           </button>
         ))}
       </div>
@@ -677,6 +687,9 @@ const HistoryPage = () => {
           )}
         </div>
       )}
+
+      {/* Interview History Tab (fetches its own data when the tab opens) */}
+      {activeTab === "interviews" && <InterviewHistoryList />}
     </main>
   );
 };

@@ -50,11 +50,12 @@ export default function InterviewRoom({
   const [captions, setCaptions] = useState<InterviewMessage[]>([]);
   const [confirmingEnd, setConfirmingEnd] = useState(false);
 
+  // Refs hold values that event handlers must read fresh (avoids stale closures).
   const messagesRef = useRef<InterviewMessage[]>([]);
   const startMsRef = useRef<number | null>(null);
   const connectingRef = useRef(false);
   const callActiveRef = useRef(false);
-  const finalizedRef = useRef(false);
+  const finalizedRef = useRef(false); // guards against saving the same interview twice
   const warnedRef = useRef(false);
   const closingRef = useRef(false);
   const failsafeRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -68,6 +69,7 @@ export default function InterviewRoom({
     connectTimerRef.current = null;
   }, []);
 
+  /** Save transcript + generate the assessment, then reload the page into the report. */
   const finalize = useCallback(async () => {
     if (finalizedRef.current) return;
     finalizedRef.current = true;
@@ -83,14 +85,16 @@ export default function InterviewRoom({
     const res = await finalizeInterview(sessionId, messagesRef.current, elapsedSec);
 
     if (res.ok || res.saved) {
+      // Transcript is stored server-side (the report page handles a failed assessment with a retry button).
       router.refresh();
       return;
     }
+    // Nothing was saved (network or auth problem). Keep the transcript in memory and let the user retry.
     finalizedRef.current = false;
     setError(res.error);
   }, [sessionId, router, clearTimers]);
 
-
+  /** The call never connected: hand the interview back so it does not count against the monthly limit. */
   const failToConnect = useCallback(
     async (message: string) => {
       if (!connectingRef.current) return;
@@ -99,6 +103,7 @@ export default function InterviewRoom({
       try {
         await vapi.stop();
       } catch {
+        /* nothing to stop */
       }
       await releaseInterviewStart(sessionId);
       setError(message);
@@ -107,6 +112,7 @@ export default function InterviewRoom({
     [sessionId, clearTimers],
   );
 
+  // VAPI event wiring (once).
   useEffect(() => {
     const onCallStart = () => {
       connectingRef.current = false;
@@ -116,7 +122,7 @@ export default function InterviewRoom({
       setPhase('live');
     };
     const onCallEnd = () => {
-      if (connectingRef.current) return; 
+      if (connectingRef.current) return; // ended before it ever started: handled by failToConnect
       void finalize();
     };
     const onSpeechStart = () => setAssistantSpeaking(true);
@@ -139,6 +145,7 @@ export default function InterviewRoom({
           'Could not connect. Allow microphone access in your browser, check your connection and try again.',
         );
       }
+      // Errors during a live call are usually followed by call-end, which saves what we have.
     };
 
     vapi.on('call-start', onCallStart);
@@ -157,12 +164,14 @@ export default function InterviewRoom({
       vapi.removeListener('error', onError);
       clearTimers();
       if (callActiveRef.current) {
+        // Navigating away mid-call: stop the (billable) call. The interview stays marked as interrupted.
         callActiveRef.current = false;
         void vapi.stop();
       }
     };
   }, [finalize, failToConnect, clearTimers]);
 
+  // Countdown, 90-second warning to the interviewer, and hard close at the chosen duration.
   useEffect(() => {
     if (phase !== 'live') return;
     const id = setInterval(() => {
@@ -179,13 +188,14 @@ export default function InterviewRoom({
       }
       if (!closingRef.current && sec >= totalSeconds) {
         closingRef.current = true;
-        vapi.say(CLOSING_LINE, true);
+        vapi.say(CLOSING_LINE, true); // speaks, then ends the call, which triggers call-end
         failsafeRef.current = setTimeout(() => void vapi.stop(), 15_000);
       }
     }, 500);
     return () => clearInterval(id);
   }, [phase, totalSeconds]);
 
+  // Warn before closing the tab mid-interview.
   useEffect(() => {
     if (phase !== 'live') return;
     const handler = (e: BeforeUnloadEvent) => {
@@ -247,12 +257,14 @@ export default function InterviewRoom({
       return;
     }
     void vapi.stop();
+    // If call-end never fires, save anyway.
     failsafeRef.current = setTimeout(() => void finalize(), 4000);
   }
 
   const remaining = Math.max(0, totalSeconds - elapsed);
   const progress = Math.min(100, (elapsed / totalSeconds) * 100);
 
+  /* ------------------------------ views ------------------------------ */
 
   if (phase === 'assessing') {
     return (
@@ -343,6 +355,7 @@ export default function InterviewRoom({
     );
   }
 
+  // idle + connecting
   return (
     <div className="iv-card iv-stack" style={{ maxWidth: 640, margin: '0 auto' }}>
       <h2 className="iv-h2" style={{ marginBottom: 0 }}>
@@ -353,7 +366,7 @@ export default function InterviewRoom({
       </p>
       <ul className="iv-bullets">
         <li>Sit somewhere quiet and answer out loud, the way you would in a real interview.</li>
-        <li>Alex will not give hints or praise. Silence and "I don&apos;t know" are scored.</li>
+        <li>Alex will not give hints or praise. Silence and &quot;I don&apos;t know&quot; are scored.</li>
         <li>The interview cannot be paused or restarted. Leaving mid-way forfeits it.</li>
         <li>The interviewer wraps up when the timer runs out. You can also end early, but ending before the
           halfway mark caps your score.</li>

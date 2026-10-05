@@ -1,4 +1,6 @@
-
+// ============================================================
+// PASTE THIS FILE AT: lib/actions/interview.actions.ts (REPLACE existing file)
+// ============================================================
 'use server';
 
 import { auth } from '@clerk/nextjs/server';
@@ -34,13 +36,13 @@ import type {
   ExperienceLevel,
   InterviewAssessment,
   InterviewFocus,
+  InterviewHistoryItem,
   InterviewListItem,
   InterviewMessage,
   InterviewMetrics,
   InterviewSessionRow,
   QuestionFeedback,
 } from '@/types/interview';
-
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const isUuid = (v: string) => UUID_RE.test(v);
@@ -93,7 +95,6 @@ function toContext(row: InterviewSessionRow): InterviewContext {
     durationMinutes: row.duration_minutes,
   };
 }
-
 
 function parseAssessment(text: string, metrics: InterviewMetrics): InterviewAssessment {
   let parsed: Record<string, unknown>;
@@ -168,6 +169,7 @@ function parseAssessment(text: string, metrics: InterviewMetrics): InterviewAsse
   };
 }
 
+/** No LLM call when there is nothing to assess: cheaper, and it cannot hallucinate feedback. */
 function buildInsufficientAssessment(metrics: InterviewMetrics): InterviewAssessment {
   const dimensions = {} as Record<DimensionKey, DimensionScore>;
   const zeros = {} as Record<DimensionKey, number>;
@@ -235,7 +237,6 @@ async function saveAssessment(
   if (error) throw new Error(error.message);
 }
 
-
 export interface CreateInterviewInput {
   jobId: string;
   customTitle?: string;
@@ -275,6 +276,7 @@ export async function createInterviewSession(
   try {
     const supabase = createSupabaseClient();
 
+    // Early feedback only. The authoritative check runs again in markInterviewStarted().
     if ((await startedThisMonth(supabase, userId)) >= INTERVIEW_MONTHLY_LIMIT) {
       return fail(`You have used all ${INTERVIEW_MONTHLY_LIMIT} interviews for this month.`);
     }
@@ -301,6 +303,7 @@ export async function createInterviewSession(
   }
 }
 
+/** Marks the call as started exactly once. Prevents refresh loops from burning VAPI credits. */
 export async function markInterviewStarted(id: string): Promise<ActionResult> {
   const { userId } = await auth();
   if (!userId) return fail('Please sign in again.');
@@ -330,6 +333,7 @@ export async function markInterviewStarted(id: string): Promise<ActionResult> {
     return fail('Could not start the interview. Try again.');
   }
 }
+
 
 export async function releaseInterviewStart(id: string): Promise<ActionResult> {
   const { userId } = await auth();
@@ -479,4 +483,87 @@ export async function getUserInterviews(limit = 10): Promise<InterviewListItem[]
     return [];
   }
   return (data ?? []) as InterviewListItem[];
+}
+
+
+export async function getInterviewHistory(limit = 50): Promise<InterviewHistoryItem[]> {
+  const { userId } = await auth();
+  if (!userId) return [];
+
+  const supabase = createSupabaseClient();
+  const { data, error } = await supabase
+    .from('interview_sessions')
+    .select(
+      'id, job_title, experience_level, focus, duration_minutes, status, score, elapsed_seconds, created_at, ' +
+        'verdict:assessment->>verdict, summary:assessment->>brutalSummary, ' +
+        'plan:assessment->actionPlan, weaknesses:assessment->weaknesses',
+    )
+    .eq('user_id', userId)
+    .in('status', ['completed', 'assessment_failed'])
+    .not('started_at', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(Math.max(1, Math.min(limit, 100)));
+
+  if (error) {
+    console.error('[interview] history failed', error.message);
+    return [];
+  }
+
+  const priorities = ['high', 'medium', 'low'];
+  return ((data ?? []) as unknown as Record<string, unknown>[]).map((r): InterviewHistoryItem => ({
+    id: String(r.id),
+    job_title: String(r.job_title ?? ''),
+    experience_level: r.experience_level as ExperienceLevel,
+    focus: r.focus as InterviewFocus,
+    duration_minutes: Number(r.duration_minutes) || 0,
+    status: r.status as InterviewHistoryItem['status'],
+    score: typeof r.score === 'number' ? r.score : null,
+    elapsed_seconds: typeof r.elapsed_seconds === 'number' ? r.elapsed_seconds : null,
+    created_at: String(r.created_at),
+    verdict: typeof r.verdict === 'string' ? (r.verdict as InterviewHistoryItem['verdict']) : null,
+    summary: typeof r.summary === 'string' ? r.summary : null,
+    plan: (Array.isArray(r.plan) ? r.plan : [])
+      .map((a): ActionItem => {
+        const o = (a ?? {}) as Record<string, unknown>;
+        return {
+          priority: priorities.includes(o.priority as string) ? (o.priority as ActionItem['priority']) : 'medium',
+          action: str(o.action, 500),
+          why: str(o.why, 400),
+        };
+      })
+      .filter((a) => a.action),
+    weaknesses: strArr(r.weaknesses, 5),
+  }));
+}
+
+export async function getInterviewTranscript(id: string): Promise<InterviewMessage[] | null> {
+  const { userId } = await auth();
+  if (!userId || !isUuid(id)) return null;
+
+  const supabase = createSupabaseClient();
+  const { data, error } = await supabase
+    .from('interview_sessions')
+    .select('transcript')
+    .eq('id', id)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return normalizeTranscript((data as { transcript: unknown }).transcript);
+}
+
+export async function deleteInterview(id: string): Promise<ActionResult> {
+  const { userId } = await auth();
+  if (!userId) return fail('Please sign in again.');
+  if (!isUuid(id)) return fail('Invalid interview.');
+
+  const supabase = createSupabaseClient();
+  const { error } = await supabase
+    .from('interview_sessions')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', userId);
+
+  if (error) return fail(error.message);
+  return { ok: true };
 }

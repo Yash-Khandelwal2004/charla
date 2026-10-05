@@ -42,7 +42,12 @@ export default async function InterviewLandingPage() {
 
       {interviews.length > 0 && (
         <section className="iv-section">
-          <h2 className="iv-h2">Your past interviews</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '1rem' }}>
+            <h2 className="iv-h2">Your past interviews</h2>
+            <Link href="/history" className="iv-small iv-link" style={{ textDecoration: 'underline' }}>
+              Transcripts and recommendations in History
+            </Link>
+          </div>
           <div className="iv-card">
             <ul className="iv-list">
               {interviews.slice(0, 10).map((i) => {
